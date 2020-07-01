@@ -11,6 +11,10 @@ namespace SpacyDotNet
 
         private List<Token> _tokens;
 
+        private List<Span> _sentences;
+        private List<Span> _nounChunks;
+        private List<Span> _ents;
+
         public Doc(dynamic doc)
         {
             _doc = doc;
@@ -38,6 +42,93 @@ namespace SpacyDotNet
                     }
 
                     return _tokens;
+                }
+            }
+        }
+
+        public List<Span> Sents
+        {
+            get
+            {
+                if (_sentences != null)
+                    return _sentences;
+
+                using (Py.GIL())
+                {
+                    _sentences = new List<Span>();
+
+                    var iter = _doc.sents.__iter__();
+                    while (true)
+                    {
+                        try
+                        {
+                            var element = iter.__next__();
+                            _sentences.Add(new Span(element));
+                        }
+                        catch (PythonException)
+                        {
+                            break;
+                        }
+                    }
+                    return _sentences;
+                }
+            }
+        }
+
+        public List<Span> NounChunks
+        {
+            get
+            {
+                if (_nounChunks != null)
+                    return _nounChunks;
+
+                using (Py.GIL())
+                {
+                    _nounChunks = new List<Span>();
+
+                    var iter = _doc.noun_chunks.__iter__();
+                    while (true)
+                    {
+                        try
+                        {
+                            var element = iter.__next__();
+                            _nounChunks.Add(new Span(element));
+                        }
+                        catch (PythonException)
+                        {
+                            break;
+                        }
+                    }
+                    return _nounChunks;
+                }
+            }
+        }
+
+        public List<Span> Ents
+        {
+            get
+            {
+                if (_ents != null)
+                    return _ents;
+
+                using (Py.GIL())
+                {
+                    _ents = new List<Span>();
+
+                    var iter = _doc.ents.__iter__();
+                    while (true)
+                    {
+                        try
+                        {
+                            var element = iter.__next__();
+                            _ents.Add(new Span(element));
+                        }
+                        catch (PythonException)
+                        {
+                            break;
+                        }
+                    }
+                    return _ents;
                 }
             }
         }

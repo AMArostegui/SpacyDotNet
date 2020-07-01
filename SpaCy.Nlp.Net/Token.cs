@@ -10,6 +10,8 @@ namespace SpacyDotNet
         private dynamic _token;
 
         private string _text;
+        private string _lemma;
+
         private string _pos;
         private string _tag;
         private string _shape;
@@ -44,6 +46,22 @@ namespace SpacyDotNet
                     _text = textPy.ToString();
                     return _text;
                 }                 
+            }
+        }
+
+        public string Lemma
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_lemma))
+                    return _lemma;
+
+                using (Py.GIL())
+                {
+                    var textPy = new PyString(_token.lemma_);
+                    _lemma = textPy.ToString();
+                    return _lemma;
+                }
             }
         }
 

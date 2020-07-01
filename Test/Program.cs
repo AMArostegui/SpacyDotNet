@@ -50,6 +50,32 @@ namespace Test
             Console.WriteLine("Like a number? " + token0.LikeNum);
             Console.WriteLine("Like an email address? " + token0.LikeEMail);
             Console.WriteLine(separator);
+
+            Console.WriteLine("Lemmatization:");
+            Console.Write("[");
+            foreach (var token in doc.Tokens)
+                Console.Write("'" + token.Lemma + "', ");
+            Console.WriteLine("\b\b]");
+            Console.WriteLine(separator);
+
+            Console.WriteLine("Sentences:");
+            Console.Write("[");
+            foreach (var sentence in doc.Sents)
+                Console.Write("'" + sentence.Text + "', ");
+            Console.WriteLine("\b\b]");
+            Console.WriteLine(separator);
+
+            Console.WriteLine("Noun Phrases:");
+            Console.Write("[");
+            foreach (var nounChunk in doc.NounChunks)
+                Console.Write("'" + nounChunk.Text + "', ");
+            Console.WriteLine("\b\b]");
+            Console.WriteLine(separator);
+
+            Console.WriteLine("Entities (Named entities, phrases and concepts):");
+            foreach (var entity in doc.Ents)
+                Console.WriteLine("Entity: " + entity.Text + "\tLabel: " + entity.Label);
+            Console.WriteLine(separator);
         }
     }
 }
