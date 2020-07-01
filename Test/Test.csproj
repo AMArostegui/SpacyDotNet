@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Python.Runtime.UnofficialNetStandard" Version="3.0.0-b01" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SpaCy.Nlp.Net\SpaCy.Nlp.Net.csproj" />
+  </ItemGroup>
+
+</Project>

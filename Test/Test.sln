@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test.csproj", "{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaCy.Nlp.Net", "..\SpaCy.Nlp.Net\SpaCy.Nlp.Net.csproj", "{163A32CF-25CB-4A95-95A0-9A4C7E085ABD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{163A32CF-25CB-4A95-95A0-9A4C7E085ABD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{163A32CF-25CB-4A95-95A0-9A4C7E085ABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{163A32CF-25CB-4A95-95A0-9A4C7E085ABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{163A32CF-25CB-4A95-95A0-9A4C7E085ABD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A512806F-79F9-44AB-9626-EBAFBD21234D}
+	EndGlobalSection
+EndGlobal
