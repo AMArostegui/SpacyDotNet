@@ -13,16 +13,16 @@
             if (!Directory.Exists(PathVirtualEnv))
                 throw new InvalidOperationException("The directory specified for PathVirtualEnv is invalid");
 
-            var pathVirtualEnvScripts = PathVirtualEnv + @"\Scripts";
-            var pathVirtualEnvLib = PathVirtualEnv + @"\Lib";
+            var pathVeScripts = PathVirtualEnv + @"\Scripts";
+            var pathVeLib = PathVirtualEnv + @"\Lib";
 
-            // TODO: Probar esto en Linux
-            Environment.SetEnvironmentVariable("PATH", pathVirtualEnvScripts, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("PYTHONHOME", pathVirtualEnvScripts, EnvironmentVariableTarget.Process);
-            var pythonPath = $"{pathVirtualEnvLib}\\site-packages;{pathVirtualEnvLib}";
+            // TODO: Try this on a Linux machine
+            Environment.SetEnvironmentVariable("PATH", pathVeScripts, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("PYTHONHOME", pathVeScripts, EnvironmentVariableTarget.Process);
+            var pythonPath = $"{pathVeLib}\\site-packages;{pathVeLib}";
             Environment.SetEnvironmentVariable("PYTHONPATH", pythonPath, EnvironmentVariableTarget.Process);
 
-            PythonEngine.PythonHome = pathVirtualEnvScripts;
+            PythonEngine.PythonHome = pathVeScripts;
             PythonEngine.PythonPath = pythonPath;
         }
 
