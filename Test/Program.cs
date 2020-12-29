@@ -14,7 +14,7 @@ namespace Test
             text += "ignorarme porque no merecía la pena hablar conmigo”, comentaba Thrun, en una entrevista a Recode ";
             text += "a principios de semana";
 
-            Spacy.PathVirtualEnv = @"C:\Users\amira_000\Dev\ProductSort\src\Libs\spaCy\venvSpaCy";
+            Spacy.PathVirtualEnv = @"C:\Users\Zamorano\Dev\ProductSort\src\Libs\spaCy\venvSpaCy";
 
             var spacy = Spacy.GetSpacy();
             spacy.Load("es_core_news_sm");

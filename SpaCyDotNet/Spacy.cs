@@ -1,6 +1,7 @@
 ﻿namespace SpacyDotNet
 {
     using System;
+    using System.IO;
     using Python.Runtime;
 
     public class Spacy
@@ -8,7 +9,9 @@
         private Spacy()
         {
             if (string.IsNullOrEmpty(PathVirtualEnv))
-                throw new InvalidOperationException("You need to define PathVirtualEnv before using this wrapper");            
+                throw new InvalidOperationException("You need to define PathVirtualEnv before using the wrapper");
+            if (!Directory.Exists(PathVirtualEnv))
+                throw new InvalidOperationException("The directory specified for PathVirtualEnv is invalid");
 
             var pathVirtualEnvScripts = PathVirtualEnv + @"\Scripts";
             var pathVirtualEnvLib = PathVirtualEnv + @"\Lib";
