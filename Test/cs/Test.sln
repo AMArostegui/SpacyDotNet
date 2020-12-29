@@ -12,18 +12,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaCyDotNet", "..\..\SpaCyD
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|x64.ActiveCfg = Debug|x64
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Debug|x64.Build.0 = Debug|x64
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|x64.ActiveCfg = Release|x64
+		{FF70F2F9-2826-49EF-851C-5FF1697FCE6A}.Release|x64.Build.0 = Release|x64
+		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Debug|x64.ActiveCfg = Debug|x64
+		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Debug|x64.Build.0 = Debug|x64
+		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Release|x64.ActiveCfg = Release|x64
+		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
