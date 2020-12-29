@@ -6,6 +6,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	
+	<!-- 
+		The library relies on Python.NET project (http://pythonnet.github.io/) to access Python functionality
+		Python.NET presents two considerations we must keep in mind
+			1) No .NET Core support. See https://github.com/pythonnet/pythonnet/issues/984
+			2) No up to date NuGet package. See https://github.com/pythonnet/pythonnet/wiki/Installation#nuget
+			
+		Anyway, we read in the project issue shown above, there's an alternative NuGet package with .NET Core support
+		It's unsupported but seems to work fine
+			https://github.com/pythonnet/pythonnet/issues/984#issuecomment-604752628
+			https://www.nuget.org/packages/Python.Runtime.UnofficialNetStandard/			
+	-->
     <PackageReference Include="Python.Runtime.UnofficialNetStandard" Version="3.0.0-b01" />
   </ItemGroup>
 
