@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpaCy.Nlp.Net\SpaCy.Nlp.Net.csproj" />
+    <ProjectReference Include="..\SpaCyDotNet\SpaCyDotNet.csproj" />
   </ItemGroup>
 
 </Project>
