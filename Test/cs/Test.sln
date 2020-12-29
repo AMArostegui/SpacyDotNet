@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test.csproj", "{FF7
 		{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1} = {CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaCyDotNet", "..\SpaCyDotNet\SpaCyDotNet.csproj", "{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaCyDotNet", "..\..\SpaCyDotNet\SpaCyDotNet.csproj", "{CC448F6D-C356-45C7-A50E-20DBD7C8ECE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

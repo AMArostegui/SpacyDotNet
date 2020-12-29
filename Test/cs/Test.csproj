@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpaCyDotNet\SpaCyDotNet.csproj" />
+    <ProjectReference Include="..\..\SpaCyDotNet\SpaCyDotNet.csproj" />
   </ItemGroup>
 
 </Project>
