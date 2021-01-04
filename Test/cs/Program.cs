@@ -1,5 +1,7 @@
 ﻿using System;
 using SpacyDotNet;
+using CommandLine;
+using System.Collections.Generic;
 
 namespace Test
 {
@@ -7,14 +9,21 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            Parser.Default.ParseArguments<CliOptions>(args)
+              .WithParsed(RunOptions)
+              .WithNotParsed(HandleParseError);
+        }
+
+        static void RunOptions(CliOptions cliOps)
+        {
+            Spacy.PathVirtualEnv = cliOps.VEnv;
+
             var separator = "____________________________________________________________________________";
             var text = @"Cuando Sebastian Thrun empezó a trabajar en coches de conducción autónoma, en 2007, para ";
             text += "Google, muy poca gente fuera de la empresa le tomó en serio. “Podría contaros como CEOs muy ";
             text += "veteranos de las empresas automotrices más grandes de América me daban la mano para después ";
             text += "ignorarme porque no merecía la pena hablar conmigo”, comentaba Thrun, en una entrevista a Recode ";
             text += "a principios de semana";
-
-            Spacy.PathVirtualEnv = @"C:\Users\Zamorano\Dev\ProductSort\src\Libs\spaCy\venvSpaCy";
 
             var spacy = Spacy.Get();
             spacy.Load("es_core_news_sm");
@@ -76,6 +85,17 @@ namespace Test
             foreach (var entity in doc.Ents)
                 Console.WriteLine("Entity: " + entity.Text + "\tLabel: " + entity.Label);
             Console.WriteLine(separator);
+        }
+
+        static void HandleParseError(IEnumerable<Error> errs)
+        {
+            Console.WriteLine("You need to specify virtual environment path");
+        }
+
+        public class CliOptions
+        {
+            [Option('v', "venv", Required = true, HelpText = "Set virtual environment path")]
+            public String VEnv { get; set; }
         }
     }
 }
