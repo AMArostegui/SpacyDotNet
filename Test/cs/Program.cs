@@ -16,7 +16,7 @@ namespace Test
 
             Spacy.PathVirtualEnv = @"C:\Users\Zamorano\Dev\ProductSort\src\Libs\spaCy\venvSpaCy";
 
-            var spacy = Spacy.GetSpacy();
+            var spacy = Spacy.Get();
             spacy.Load("es_core_news_sm");
 
             var doc = spacy.GetDocument(text);
