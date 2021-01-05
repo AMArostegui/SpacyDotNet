@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LostTech.Python.Runtime" Version="3.0.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	
 	<!-- 
@@ -19,7 +20,6 @@
 			https://github.com/pythonnet/pythonnet/issues/984#issuecomment-604752628
 			https://www.nuget.org/packages/Python.Runtime.UnofficialNetStandard/			
 	-->
-    <PackageReference Include="Python.Runtime.UnofficialNetStandard" Version="3.0.0-b01" />
   </ItemGroup>
 
 </Project>
