@@ -20,6 +20,8 @@
         private static Spacy _instance;
         private dynamic _nlp;
 
+        public static string PathBase
+            { get; set; }
         public static string PathVirtualEnv
             { get; set; }
 
@@ -36,7 +38,7 @@
         /// Fixing Python.NET itself would be better but for now, I'm just going to copy sys.path
         /// </summary>
         /// <param name="pathVirtualEnv">Path to virtual environment</param>        
-        public void Init(string pathVirtualEnv)
+        public static void Init(string pathVirtualEnv)
         {
             string pathVeScripts;
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -62,6 +64,16 @@
 
             Environment.SetEnvironmentVariable("PYTHONPATH", pythonPath, EnvironmentVariableTarget.Process);
             PythonEngine.PythonPath = pythonPath;
+        }
+
+        public static void InitOfficial(string pathBase, string pathVirtualEnv)
+        {
+            Environment.SetEnvironmentVariable("PATH", pathVirtualEnv, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("PYTHONHOME", pathVirtualEnv, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("PYTHONPATH", $"{pathVirtualEnv}\\Lib\\site-packages;{pathBase}\\Lib", EnvironmentVariableTarget.Process);
+
+            PythonEngine.PythonHome = pathVirtualEnv;
+            PythonEngine.PythonPath = Environment.GetEnvironmentVariable("PYTHONPATH", EnvironmentVariableTarget.Process);
         }
 
         public string PipeNames

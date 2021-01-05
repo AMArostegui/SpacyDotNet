@@ -16,7 +16,8 @@ namespace Test
 
         static void RunOptions(CliOptions cliOps)
         {
-            Spacy.PathVirtualEnv = cliOps.VEnv;
+            Spacy.PathBase = cliOps.PathBase;
+            Spacy.PathVirtualEnv = cliOps.PathVirtualEnv;
 
             var separator = "____________________________________________________________________________";
             var text = @"Cuando Sebastian Thrun empezó a trabajar en coches de conducción autónoma, en 2007, para ";
@@ -94,8 +95,11 @@ namespace Test
 
         public class CliOptions
         {
-            [Option('v', "venv", Required = true, HelpText = "Set virtual environment path")]
-            public String VEnv { get; set; }
+            [Option("base", Required = false, HelpText = "Set base intepreter path. Useful mostly to try the 'official' initiaization code")]
+            public string PathBase { get; set; }
+
+            [Option("venv", Required = true, HelpText = "Set virtual environment path")]
+            public string PathVirtualEnv { get; set; }
         }
     }
 }
