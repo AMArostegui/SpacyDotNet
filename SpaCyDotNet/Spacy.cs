@@ -48,8 +48,8 @@
             var pythonPath = string.Empty;
 
             var proc = new Process();
-            proc.StartInfo.FileName = pathVeScripts + Path.DirectorySeparatorChar + "python";
-            proc.StartInfo.Arguments = "-c \"import sys; print(';'.join(sys.path))\"";
+            proc.StartInfo.FileName = pathVeScripts + Path.DirectorySeparatorChar + "python";            
+            proc.StartInfo.Arguments = $"-c \"import sys; print('{Path.PathSeparator}'.join(sys.path))\"";
             proc.StartInfo.RedirectStandardOutput = true;
             if (!proc.Start())
                 throw new Exception("Couldn't initialize Python in virtual environment");
