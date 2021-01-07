@@ -32,5 +32,31 @@ namespace SpacyDotNet
                 return stringMember;
             }
         }
+
+        public static List<T> GetList<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
+        {
+            if (lstMember != null)
+                return lstMember;
+
+            using (Py.GIL())
+            {
+                lstMember = new List<T>();
+
+                var iter = dynIterPy.__iter__();
+                while (true)
+                {
+                    try
+                    {
+                        var element = iter.__next__();
+                        lstMember.Add(Activator.CreateInstance(typeof(T), element));
+                    }
+                    catch (PythonException)
+                    {
+                        break;
+                    }
+                }
+                return lstMember;
+            }
+        }
     }
 }

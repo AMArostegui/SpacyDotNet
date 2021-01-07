@@ -27,25 +27,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_tokens != null)
-                    return _tokens;
-
-                using (Py.GIL())
-                {
-                    _tokens = new List<Token>();
-
-                    var lenPy = new PyInt(_doc.__len__());
-                    var len = lenPy.ToInt32();
-                    
-                    for (var i = 0; i < len; i++)
-                    {
-                        var iPy = new PyInt(i);                        
-                        var token = new Token(_doc.__getitem__(iPy));
-                        _tokens.Add(token);
-                    }
-
-                    return _tokens;
-                }
+                return Utils.GetList(_doc, ref _tokens);
             }
         }
 
@@ -53,28 +35,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_sentences != null)
-                    return _sentences;
-
-                using (Py.GIL())
-                {
-                    _sentences = new List<Span>();
-
-                    var iter = _doc.sents.__iter__();
-                    while (true)
-                    {
-                        try
-                        {
-                            var element = iter.__next__();
-                            _sentences.Add(new Span(element));
-                        }
-                        catch (PythonException)
-                        {
-                            break;
-                        }
-                    }
-                    return _sentences;
-                }
+                return Utils.GetList(_doc.sents, ref _sentences);
             }
         }
 
@@ -82,28 +43,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_nounChunks != null)
-                    return _nounChunks;
-
-                using (Py.GIL())
-                {
-                    _nounChunks = new List<Span>();
-
-                    var iter = _doc.noun_chunks.__iter__();
-                    while (true)
-                    {
-                        try
-                        {
-                            var element = iter.__next__();
-                            _nounChunks.Add(new Span(element));
-                        }
-                        catch (PythonException)
-                        {
-                            break;
-                        }
-                    }
-                    return _nounChunks;
-                }
+                return Utils.GetList(_doc.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -111,28 +51,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_ents != null)
-                    return _ents;
-
-                using (Py.GIL())
-                {
-                    _ents = new List<Span>();
-
-                    var iter = _doc.ents.__iter__();
-                    while (true)
-                    {
-                        try
-                        {
-                            var element = iter.__next__();
-                            _ents.Add(new Span(element));
-                        }
-                        catch (PythonException)
-                        {
-                            break;
-                        }
-                    }
-                    return _ents;
-                }
+                return Utils.GetList(_doc.ents, ref _ents);
             }
         }
     }

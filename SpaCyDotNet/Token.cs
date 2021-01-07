@@ -25,6 +25,11 @@ namespace SpacyDotNet
         private double? _vectorNorm;
         private bool? _isOov;
 
+        public Token()
+        {
+            // Needed just to use generics
+        }
+
         public Token(dynamic token)
         {
             _isAlpha = null;

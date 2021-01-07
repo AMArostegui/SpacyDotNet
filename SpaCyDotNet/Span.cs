@@ -14,6 +14,11 @@ namespace SpacyDotNet
         private int? _startChar;
         private int? _endChar;
 
+        public Span()
+        {
+            // Needed just to use generics
+        }
+
         public Span(dynamic sentence)
         {
             _span = sentence;
