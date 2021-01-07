@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Python.Runtime;
+﻿using Python.Runtime;
 
 namespace SpacyDotNet
 {
