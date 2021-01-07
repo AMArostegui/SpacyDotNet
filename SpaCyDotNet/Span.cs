@@ -25,15 +25,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_text))
-                    return _text;
-
-                using (Py.GIL())
-                {
-                    var textPy = new PyString(_span.text);
-                    _text = textPy.ToString();
-                    return _text;
-                }
+                return Utils.GetString(_span.text, ref _text);
             }
         }
 
@@ -41,15 +33,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_label))
-                    return _label;
-
-                using (Py.GIL())
-                {
-                    var textPy = new PyString(_span.label_);
-                    _label = textPy.ToString();
-                    return _label;
-                }
+                return Utils.GetString(_span.label_, ref _label);
             }
         }
 

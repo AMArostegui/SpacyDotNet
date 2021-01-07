@@ -19,5 +19,18 @@ namespace SpacyDotNet
                 return (bool)boolMember;
             }
         }
+
+        public static string GetString(dynamic dynStringPyObj, ref string stringMember)
+        {
+            if (stringMember != null)
+                return stringMember;
+
+            using (Py.GIL())
+            {
+                var depPy = new PyString(dynStringPyObj);
+                stringMember = depPy.ToString();
+                return stringMember;
+            }
+        }
     }
 }

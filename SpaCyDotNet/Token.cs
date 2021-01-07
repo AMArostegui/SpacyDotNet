@@ -41,15 +41,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_text))
-                    return _text;
-
-                using (Py.GIL())
-                {
-                    var textPy = new PyString(_token.text);
-                    _text = textPy.ToString();
-                    return _text;
-                }                 
+                return Utils.GetString(_token.text, ref _text);
             }
         }
 
@@ -57,15 +49,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_lemma))
-                    return _lemma;
-
-                using (Py.GIL())
-                {
-                    var textPy = new PyString(_token.lemma_);
-                    _lemma = textPy.ToString();
-                    return _lemma;
-                }
+                return Utils.GetString(_token.lemma_, ref _lemma);
             }
         }
 
@@ -73,15 +57,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_pos))
-                    return _pos;
-
-                using (Py.GIL())
-                {
-                    var posPy = new PyString(_token.pos_);
-                    _pos = posPy.ToString();
-                    return _pos;
-                }
+                return Utils.GetString(_token.pos_, ref _pos);
             }
         }
 
@@ -89,15 +65,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_tag))
-                    return _tag;
-
-                using (Py.GIL())
-                {
-                    var tagPy = new PyString(_token.tag_);
-                    _tag = tagPy.ToString();
-                    return _tag;
-                }
+                return Utils.GetString(_token.tag_, ref _tag);
             }
         }
 
@@ -105,15 +73,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_dep))
-                    return _dep;
-
-                using (Py.GIL())
-                {
-                    var depPy = new PyString(_token.dep_);
-                    _dep = depPy.ToString();
-                    return _dep;
-                }
+                return Utils.GetString(_token.dep_, ref _dep);
             }
         }
 
@@ -121,15 +81,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (!string.IsNullOrEmpty(_shape))
-                    return _shape;
-
-                using (Py.GIL())
-                {
-                    var shapePy = new PyString(_token.shape_);
-                    _shape = shapePy.ToString();
-                    return _shape;
-                }
+                return Utils.GetString(_token.shape_, ref _shape);
             }
         }
 
