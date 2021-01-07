@@ -6,9 +6,12 @@ namespace SpacyDotNet
     {
         private dynamic _lang;
 
+        private string _pipeNames;
+
         public Lang(dynamic lang)
         {
             _lang = lang;
+            _pipeNames = null;
         }
 
         public Doc GetDocument(string text)
@@ -25,11 +28,7 @@ namespace SpacyDotNet
         {
             get
             {
-                using (Py.GIL())
-                {
-                    var pyPipeNames = _lang.pipe_names;
-                    return pyPipeNames.ToString();
-                }
+                return Utils.GetString(_lang.pipe_names, ref _pipeNames);
             }
         }
     }
