@@ -25,6 +25,14 @@ namespace Test
             Console.WriteLine("");
             foreach (Token token in tokens.Tokens)
                 Console.WriteLine($"{token.Text} {token.HasVector} {token.VectorNorm}, {token.IsOov}");
+
+            tokens = nlp.GetDocument("dog cat banana");
+            Console.WriteLine("");
+            foreach (Token token1 in tokens.Tokens)
+            {
+                foreach (Token token2 in tokens.Tokens)
+                    Console.WriteLine($"{token1.Text} {token2.Text} {token1.Similarity(token2) }");
+            }
         }
     }
 }

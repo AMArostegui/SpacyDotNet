@@ -42,6 +42,9 @@ namespace SpacyDotNet
             _token = token;
         }
 
+        internal dynamic PyObj
+            { get { return _token; } }
+
         public string Text
         {
             get
@@ -159,6 +162,16 @@ namespace SpacyDotNet
             get
             {
                 return Utils.GetBool(_token.is_oov, ref _isOov);
+            }
+        }
+
+        public double Similarity(Token token)
+        {
+            using (Py.GIL())
+            {                
+                dynamic similarityPy = _token.similarity(token.PyObj);
+                var similarityPyFloat = PyFloat.AsFloat(similarityPy);
+                return similarityPyFloat.As<double>();
             }
         }
     }
