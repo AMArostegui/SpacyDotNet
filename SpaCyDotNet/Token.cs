@@ -137,15 +137,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_isAlpha != null)
-                    return (bool)_isAlpha;
-
-                using (Py.GIL())
-                {
-                    var isAlphaPy = new PyInt(_token.is_alpha);
-                    _isAlpha = isAlphaPy.ToInt32() != 0;
-                    return (bool)_isAlpha;
-                }
+                return Utils.GetBool(_token.is_alpha, ref _isAlpha);
             }
         }
 
@@ -153,15 +145,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_isStop != null)
-                    return (bool)_isStop;
-
-                using (Py.GIL())
-                {
-                    var isStopPy = new PyInt(_token.is_stop);
-                    _isStop = isStopPy.ToInt32() != 0;
-                    return (bool)_isStop;
-                }
+                return Utils.GetBool(_token.is_stop, ref _isStop);
             }
         }
 
@@ -169,15 +153,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_isPunct != null)
-                    return (bool)_isPunct;
-
-                using (Py.GIL())
-                {
-                    var isPunctPy = new PyInt(_token.is_punct);
-                    _isPunct = isPunctPy.ToInt32() != 0;
-                    return (bool)_isPunct;
-                }
+                return Utils.GetBool(_token.is_punct, ref _isPunct);
             }
         }
 
@@ -185,15 +161,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_isDigit != null)
-                    return (bool)_isDigit;
-
-                using (Py.GIL())
-                {
-                    var isDigitPy = new PyInt(_token.is_digit);
-                    _isDigit = isDigitPy.ToInt32() != 0;
-                    return (bool)_isDigit;
-                }
+                return Utils.GetBool(_token.is_digit, ref _isDigit);
             }
         }
 
@@ -201,15 +169,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_likeNum != null)
-                    return (bool)_likeNum;
-
-                using (Py.GIL())
-                {
-                    var isLikeNumPy = new PyInt(_token.like_num);
-                    _likeNum = isLikeNumPy.ToInt32() != 0;
-                    return (bool)_likeNum;
-                }
+                return Utils.GetBool(_token.like_num, ref _likeNum);
             }
         }
 
@@ -217,15 +177,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_likeEMail != null)
-                    return (bool)_likeEMail;
-
-                using (Py.GIL())
-                {
-                    var isLikeEMailPy = new PyInt(_token.like_email);
-                    _likeEMail = isLikeEMailPy.ToInt32() != 0;
-                    return (bool)_likeEMail;
-                }
+                return Utils.GetBool(_token.like_email, ref _likeEMail);
             }
         }
 
@@ -233,16 +185,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_hasVector != null)
-                    return (bool)_hasVector;
-
-                using (Py.GIL())
-                {
-                    var hasVectorPy = new PyInt(_token.has_vector);
-                    _hasVector = hasVectorPy.ToInt32() != 0;
-                    return (bool)_hasVector;
-                }
-
+                return Utils.GetBool(_token.has_vector, ref _hasVector);
             }
         }
 
@@ -267,15 +210,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_isOov != null)
-                    return (bool)_isOov;
-
-                using (Py.GIL())
-                {
-                    var isOovPy = new PyInt(_token.is_oov);
-                    _isOov = isOovPy.ToInt32() != 0;
-                    return (bool)_isOov;
-                }
+                return Utils.GetBool(_token.is_oov, ref _isOov);
             }
         }
     }
