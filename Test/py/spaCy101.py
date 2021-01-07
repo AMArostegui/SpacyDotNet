@@ -23,3 +23,8 @@ print("")
 for token1 in tokens:
     for token2 in tokens:
         print(token1.text, token2.text, token1.similarity(token2))
+
+doc = nlp("I love coffee")
+print("")
+print(doc.vocab.strings["coffee"])  # 3197928453018144401
+print(doc.vocab.strings[3197928453018144401])  # 'coffee'

@@ -33,6 +33,11 @@ namespace Test
                 foreach (Token token2 in tokens.Tokens)
                     Console.WriteLine($"{token1.Text} {token2.Text} {token1.Similarity(token2) }");
             }
+
+            doc = nlp.GetDocument("I love cofee");
+            Console.WriteLine("");
+            Console.WriteLine(doc.Vocab.Strings["coffee"]);
+            Console.WriteLine(doc.Vocab.Strings[3197928453018144401]);
         }
     }
 }

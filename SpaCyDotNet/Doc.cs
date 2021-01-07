@@ -9,6 +9,8 @@ namespace SpacyDotNet
     {
         private dynamic _doc;
 
+        private Vocab _vocab;
+
         private List<Token> _tokens;
 
         private List<Span> _sentences;
@@ -18,6 +20,7 @@ namespace SpacyDotNet
         public Doc(dynamic doc)
         {
             _doc = doc;
+            _vocab = null;
         }
 
         internal dynamic PyObj
@@ -52,6 +55,22 @@ namespace SpacyDotNet
             get
             {
                 return Utils.GetList(_doc.ents, ref _ents);
+            }
+        }
+
+        public Vocab Vocab
+        {
+            get
+            {
+                if (_vocab != null)
+                    return _vocab;
+
+                using (Py.GIL())
+                {
+                    var vocab = _doc.vocab;
+                    _vocab = new Vocab(vocab);
+                    return _vocab;
+                }
             }
         }
     }
