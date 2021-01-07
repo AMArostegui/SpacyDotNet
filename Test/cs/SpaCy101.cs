@@ -12,7 +12,12 @@ namespace Test
 
             var doc = nlp.GetDocument("Apple is looking at buying U.K. startup for $1 billion");
             foreach (Token token in doc.Tokens)
-                Console.WriteLine($"{token.Text} {token.Lemma} {token.PoS} {token.Tag} {token.Dep} {token.Shape} {token.IsAlpha} {token.IsStop}");                
+                Console.WriteLine($"{token.Text} {token.Lemma} {token.PoS} {token.Tag} {token.Dep} {token.Shape} {token.IsAlpha} {token.IsStop}");
+
+            Console.WriteLine("");
+
+            foreach (Span ent in doc.Ents)
+                Console.WriteLine($"{ent.Text} {ent.StartChar} {ent.EndChar} {ent.Label}");
         }
     }
 }
