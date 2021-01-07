@@ -11,9 +11,11 @@ namespace SpacyDotNet
 
         private string _pos;
         private string _tag;
+        private string _dep;
         private string _shape;
 
         private bool? _isAlpha;
+        private bool? _isStop;
         private bool? _isPunct;
         private bool? _isDigit;
         private bool? _likeNum;
@@ -22,6 +24,7 @@ namespace SpacyDotNet
         public Token(dynamic token)
         {
             _isAlpha = null;
+            _isStop = null;
             _isPunct = null;
             _isDigit = null;
             _likeNum = null;
@@ -94,6 +97,22 @@ namespace SpacyDotNet
             }
         }
 
+        public string Dep
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_dep))
+                    return _dep;
+
+                using (Py.GIL())
+                {
+                    var depPy = new PyString(_token.dep_);
+                    _dep = depPy.ToString();
+                    return _dep;
+                }
+            }
+        }
+
         public string Shape
         {
             get
@@ -122,6 +141,22 @@ namespace SpacyDotNet
                     var isAlphaPy = new PyInt(_token.is_alpha);
                     _isAlpha = isAlphaPy.ToInt32() != 0;
                     return (bool)_isAlpha;
+                }
+            }
+        }
+
+        public bool IsStop
+        {
+            get
+            {
+                if (_isStop != null)
+                    return (bool)_isStop;
+
+                using (Py.GIL())
+                {
+                    var isStopPy = new PyInt(_token.is_stop);
+                    _isStop = isStopPy.ToInt32() != 0;
+                    return (bool)_isStop;
                 }
             }
         }

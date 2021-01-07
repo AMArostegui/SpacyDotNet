@@ -16,10 +16,11 @@ namespace Test
 
         static void RunOptions(CliOptions cliOps)
         {
-            PythonRuntimeUtils.Init(cliOps.PathVirtualEnv);            
+            PythonRuntimeUtils.Init(cliOps.PathVirtualEnv);
 
-            ExampleES.Run();
-            //SpaCy101.Run();
+            //ExampleES.Run();
+            SpaCy101.Run();
+            //DisplaCy.Run();
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

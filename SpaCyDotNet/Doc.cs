@@ -20,6 +20,9 @@ namespace SpacyDotNet
             _doc = doc;
         }
 
+        internal dynamic PyObj
+            { get { return _doc; } }
+
         public List<Token> Tokens
         {
             get
