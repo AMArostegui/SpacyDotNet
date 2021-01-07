@@ -33,6 +33,32 @@ namespace SpacyDotNet
             }
         }
 
+        public static double GetDouble(dynamic dynDoublePyObj, ref double? doubleMember)
+        {
+            if (doubleMember != null)
+                return (double)doubleMember;
+
+            using (Py.GIL())
+            {
+                var dynDoublePyFloat = PyFloat.AsFloat(dynDoublePyObj);
+                doubleMember = dynDoublePyFloat.As<double>();
+                return (double)doubleMember;
+            }
+        }
+
+        public static int GetInt(dynamic dynIntPyObj, ref int? intMember)
+        {
+            if (intMember != null)
+                return (int)intMember;
+
+            using (Py.GIL())
+            {
+                var startCharPy = new PyInt(dynIntPyObj);
+                intMember = startCharPy.ToInt32();
+                return (int)intMember;
+            }
+        }
+
         public static List<T> GetList<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
         {
             if (lstMember != null)

@@ -150,16 +150,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_vectorNorm != null)
-                    return (double)_vectorNorm;
-
-                using (Py.GIL())
-                {
-                    var vectorNormPy = _token.vector_norm;
-                    var vectorNormFloatPy = PyFloat.AsFloat(vectorNormPy);
-                    _vectorNorm = vectorNormFloatPy.As<double>();
-                    return (double)_vectorNorm;
-                }
+                return Utils.GetDouble(_token.vector_norm, ref _vectorNorm);
             }
         }
 

@@ -46,15 +46,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_startChar != null)
-                    return (int)_startChar;
-
-                using (Py.GIL())
-                {
-                    var startCharPy = new PyInt(_span.start_char);
-                    _startChar = startCharPy.ToInt32();
-                    return (int)_startChar;
-                }
+                return Utils.GetInt(_span.start_char, ref _startChar);
             }
         }
 
@@ -62,15 +54,7 @@ namespace SpacyDotNet
         {
             get
             {
-                if (_endChar != null)
-                    return (int)_endChar;
-
-                using (Py.GIL())
-                {
-                    var endCharPy = new PyInt(_span.end_char);
-                    _endChar = endCharPy.ToInt32();
-                    return (int)_endChar;
-                }
+                return Utils.GetInt(_span.end_char, ref _endChar);
             }
         }
     }
