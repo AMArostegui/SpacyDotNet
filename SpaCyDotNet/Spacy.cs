@@ -8,7 +8,7 @@
         {
         }
 
-        public dynamic Load(string model)
+        public Lang Load(string model)
         {
             using (Py.GIL())
             {

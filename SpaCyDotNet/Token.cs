@@ -21,6 +21,10 @@ namespace SpacyDotNet
         private bool? _likeNum;
         private bool? _likeEMail;
 
+        private bool? _hasVector;
+        private double? _vectorNorm;
+        private bool? _isOov;
+
         public Token(dynamic token)
         {
             _isAlpha = null;
@@ -221,6 +225,56 @@ namespace SpacyDotNet
                     var isLikeEMailPy = new PyInt(_token.like_email);
                     _likeEMail = isLikeEMailPy.ToInt32() != 0;
                     return (bool)_likeEMail;
+                }
+            }
+        }
+
+        public bool HasVector
+        {
+            get
+            {
+                if (_hasVector != null)
+                    return (bool)_hasVector;
+
+                using (Py.GIL())
+                {
+                    var hasVectorPy = new PyInt(_token.has_vector);
+                    _hasVector = hasVectorPy.ToInt32() != 0;
+                    return (bool)_hasVector;
+                }
+
+            }
+        }
+
+        public double VectorNorm
+        {
+            get
+            {
+                if (_vectorNorm != null)
+                    return (double)_vectorNorm;
+
+                using (Py.GIL())
+                {
+                    var vectorNormPy = _token.vector_norm;
+                    var vectorNormFloatPy = PyFloat.AsFloat(vectorNormPy);
+                    _vectorNorm = vectorNormFloatPy.As<double>();
+                    return (double)_vectorNorm;
+                }
+            }
+        }
+
+        public bool IsOov
+        {
+            get
+            {
+                if (_isOov != null)
+                    return (bool)_isOov;
+
+                using (Py.GIL())
+                {
+                    var isOovPy = new PyInt(_token.is_oov);
+                    _isOov = isOovPy.ToInt32() != 0;
+                    return (bool)_isOov;
                 }
             }
         }
