@@ -34,10 +34,18 @@ namespace Test
                     Console.WriteLine($"{token1.Text} {token2.Text} {token1.Similarity(token2) }");
             }
 
-            doc = nlp.GetDocument("I love cofee");
+            doc = nlp.GetDocument("I love coffee");
             Console.WriteLine("");
             Console.WriteLine(doc.Vocab.Strings["coffee"]);
             Console.WriteLine(doc.Vocab.Strings[3197928453018144401]);
+
+            Console.WriteLine("");
+            foreach (Token word in doc.Tokens)
+            {
+                var lexeme = doc.Vocab[word.Text];
+                Console.WriteLine($@"{lexeme.Text} {lexeme.Orth} {lexeme.Shape} {lexeme.Prefix} {lexeme.Suffix} 
+{lexeme.IsAlpha} {lexeme.IsDigit} {lexeme.IsTitle} {lexeme.Lang}");
+            }
         }
     }
 }

@@ -60,7 +60,7 @@ namespace SpacyDotNet
                     return valStr;
                 }
 
-                throw new Exception("Invalid parameter passed to StringStore");
+                throw new Exception("Wrong datatype in parameter passed to StringStore");
             }
         }
     }

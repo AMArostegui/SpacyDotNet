@@ -9,12 +9,60 @@ namespace SpacyDotNet
     {
         private dynamic _vocab;
 
+        private Dictionary<string, Lexeme> _dictStr2Lex;
+        private Dictionary<long, Lexeme> _dictLong2Lex;
         private StringStore _stringStore;
 
         public Vocab(dynamic vocab)
         {
             _vocab = vocab;
-            _stringStore = null;
+            _dictStr2Lex = new Dictionary<string, Lexeme>();
+            _dictLong2Lex = new Dictionary<long, Lexeme>();            
+            _stringStore = null;            
+        }
+
+        public Lexeme this[object key]
+        {
+            get
+            {
+                var keyStr = key as string;
+                if (keyStr != null)
+                {
+                    if (_dictStr2Lex.ContainsKey(keyStr))
+                        return _dictStr2Lex[keyStr];
+
+                    Lexeme lexeme = null;
+                    using (Py.GIL())
+                    {
+                        var pyStr = new PyString(keyStr);
+                        var dynPyObj = _vocab.__getitem__(pyStr);
+                        lexeme = new Lexeme(dynPyObj);                        
+                        _dictStr2Lex.Add(keyStr, lexeme);
+                    }
+
+                    return lexeme;
+                }
+
+                var keyHashN = key as long?;
+                if (keyHashN != null)
+                {
+                    var keyHash = (long)keyHashN;
+                    if (_dictLong2Lex.ContainsKey(keyHash))
+                        return _dictLong2Lex[keyHash];
+
+                    Lexeme lexeme = null;
+                    using (Py.GIL())
+                    {
+                        var dynPyObj = _vocab.__getitem__(key);
+                        lexeme = new Lexeme(dynPyObj);                        
+                        _dictLong2Lex.Add(keyHash, lexeme);
+                    }
+
+                    return lexeme;
+                }
+
+                throw new Exception("Wrong datatype in parameter passed to Vocab");
+            }
         }
 
         public StringStore Strings

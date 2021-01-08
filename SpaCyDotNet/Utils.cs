@@ -53,11 +53,25 @@ namespace SpacyDotNet
 
             using (Py.GIL())
             {
-                var startCharPy = new PyInt(dynIntPyObj);
-                intMember = startCharPy.ToInt32();
+                var intPy = new PyInt(dynIntPyObj);
+                intMember = intPy.ToInt32();
                 return (int)intMember;
             }
         }
+
+        public static long GetLong(dynamic dynLongPyObj, ref long? longMember)
+        {
+            if (longMember != null)
+                return (long)longMember;
+
+            using (Py.GIL())
+            {
+                var longPy = new PyLong(dynLongPyObj);
+                longMember = longPy.ToInt64();
+                return (long)longMember;
+            }
+        }
+
 
         public static List<T> GetList<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
         {
