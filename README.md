@@ -127,3 +127,6 @@ for word in doc:
     print(lexeme.text, lexeme.orth, lexeme.shape_, lexeme.prefix_, lexeme.suffix_,
             lexeme.is_alpha, lexeme.is_digit, lexeme.is_title, lexeme.lang_)
 ```
+### Output
+
+![Output](https://github.com/AMArostegui/SpacyDotNet/blob/master/Output.png)
