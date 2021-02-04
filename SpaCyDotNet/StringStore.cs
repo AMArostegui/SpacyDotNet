@@ -12,7 +12,7 @@ namespace SpacyDotNet
         private Dictionary<string, long> _dictStrToLong;
         private Dictionary<long, string> _dictLongToStr;
 
-        public StringStore(dynamic stringStore)
+        internal StringStore(dynamic stringStore)
         {
             _stringStore = stringStore;
             _dictStrToLong = new Dictionary<string, long>();

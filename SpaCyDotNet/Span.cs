@@ -19,7 +19,7 @@ namespace SpacyDotNet
             // Needed just to use generics
         }
 
-        public Span(dynamic sentence)
+        internal Span(dynamic sentence)
         {
             _span = sentence;
             _startChar = null;

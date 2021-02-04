@@ -17,7 +17,19 @@ namespace SpacyDotNet
         private List<Span> _nounChunks;
         private List<Span> _ents;
 
-        public Doc(dynamic doc)
+        public Doc(Vocab vocab)
+        {
+            _vocab = vocab;
+
+            using (Py.GIL())
+            {
+                dynamic spacy = Py.Import("spacy");
+                dynamic pyVocab = vocab.PyObj;
+                _doc = spacy.tokens.doc.Doc.__call__(pyVocab);
+            }
+        }
+
+        internal Doc(dynamic doc)
         {
             _doc = doc;
             _vocab = null;
@@ -71,6 +83,24 @@ namespace SpacyDotNet
                     _vocab = new Vocab(vocab);
                     return _vocab;
                 }
+            }
+        }
+
+        public void ToDisk(string path)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _doc.to_disk(pyPath);
+            }
+        }
+
+        public void FromDisk(string path)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _doc.from_disk(pyPath);
             }
         }
     }

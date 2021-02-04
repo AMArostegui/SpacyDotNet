@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Text;
 using Python.Runtime;
 
@@ -88,7 +90,13 @@ namespace SpacyDotNet
                     try
                     {
                         var element = iter.__next__();
-                        lstMember.Add(Activator.CreateInstance(typeof(T), element));
+
+                        Binder binder = null;
+                        BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+                        CultureInfo culture = null;
+                        var parameters = new object[] { element };
+
+                        lstMember.Add((T)Activator.CreateInstance(typeof(T), flags, binder, parameters, culture));
                     }
                     catch (PythonException)
                     {

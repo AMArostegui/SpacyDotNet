@@ -8,7 +8,7 @@ namespace SpacyDotNet
 
         private string _pipeNames;
 
-        public Lang(dynamic lang)
+        internal Lang(dynamic lang)
         {
             _lang = lang;
             _pipeNames = null;

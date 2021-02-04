@@ -20,7 +20,7 @@ namespace SpacyDotNet
         private bool? _isDigit;
         private bool? _isTitle;
 
-        public Lexeme(dynamic lexeme)
+        internal Lexeme(dynamic lexeme)
         {
             _lexeme = lexeme;
             _text = null;            

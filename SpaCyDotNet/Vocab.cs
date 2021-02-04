@@ -9,17 +9,29 @@ namespace SpacyDotNet
     {
         private dynamic _vocab;
 
-        private Dictionary<string, Lexeme> _dictStr2Lex;
-        private Dictionary<long, Lexeme> _dictLong2Lex;
-        private StringStore _stringStore;
+        private Dictionary<string, Lexeme> _dictStr2Lex = new Dictionary<string, Lexeme>();
+        private Dictionary<long, Lexeme> _dictLong2Lex = new Dictionary<long, Lexeme>();
+        private StringStore _stringStore = null;
 
-        public Vocab(dynamic vocab)
+        public Vocab()
+        {
+            using (Py.GIL())
+            {
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    _vocab = spacy.vocab.Vocab.__call__();
+                }
+            }
+        }
+
+        internal Vocab(dynamic vocab)
         {
             _vocab = vocab;
-            _dictStr2Lex = new Dictionary<string, Lexeme>();
-            _dictLong2Lex = new Dictionary<long, Lexeme>();            
-            _stringStore = null;            
         }
+
+        internal dynamic PyObj
+            { get { return _vocab; } }
 
         public Lexeme this[object key]
         {
@@ -78,6 +90,24 @@ namespace SpacyDotNet
                     _stringStore = new StringStore(stringStore);
                     return _stringStore;
                 }
+            }
+        }
+
+        public void ToDisk(string path)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _vocab.to_disk(pyPath);
+            }
+        }
+
+        public void FromDisk(string path)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _vocab.from_disk(pyPath);
             }
         }
     }

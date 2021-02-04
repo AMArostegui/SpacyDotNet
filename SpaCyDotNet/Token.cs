@@ -30,7 +30,7 @@ namespace SpacyDotNet
             // Needed just to use generics
         }
 
-        public Token(dynamic token)
+        internal Token(dynamic token)
         {
             _isAlpha = null;
             _isStop = null;
