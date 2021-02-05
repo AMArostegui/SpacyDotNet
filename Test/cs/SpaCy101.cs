@@ -46,9 +46,11 @@ namespace Test
                 Console.WriteLine($@"{lexeme.Text} {lexeme.Orth} {lexeme.Shape} {lexeme.Prefix} {lexeme.Suffix} {lexeme.IsAlpha} {lexeme.IsDigit} {lexeme.IsTitle} {lexeme.Lang}");
             }
 
-            doc.ToDisk("doc.out");
+            //doc.ToDisk("doc.out");
+            byte[] docBytes = doc.ToBytes();
             var doc2 = new Doc(new Vocab());
-            doc2.FromDisk("doc.out");
+            //doc2.FromDisk("doc.out");
+            doc2.FromBytes(docBytes);
 
             Console.WriteLine("");
             foreach (Token word2 in doc2.Tokens)

@@ -37,9 +37,11 @@ for word in doc:
     print(lexeme.text, lexeme.orth, lexeme.shape_, lexeme.prefix_, lexeme.suffix_,
             lexeme.is_alpha, lexeme.is_digit, lexeme.is_title, lexeme.lang_)
 
-doc.to_disk("doc.out")
+#doc.to_disk("doc.out")
+doc_bytes = doc.to_bytes()
 doc2 = Doc(Vocab())
-doc2.from_disk("doc.out")
+#doc2.from_disk("doc.out")
+doc2.from_bytes(doc_bytes)
 
 print("")
 for word2 in doc2:

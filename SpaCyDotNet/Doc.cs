@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Collections.Generic;
 using Python.Runtime;
+using System.Diagnostics;
 
 namespace SpacyDotNet
 {
@@ -101,6 +102,35 @@ namespace SpacyDotNet
             {
                 var pyPath = new PyString(path);
                 _doc.from_disk(pyPath);
+            }
+        }
+
+        public byte[] ToBytes()
+        {
+            using (Py.GIL())
+            {
+                dynamic dpyBytes = _doc.to_bytes();
+                var pyBytes = (PyObject)dpyBytes;
+                var pyBuff = pyBytes.GetBuffer();
+
+                var buff = new byte[pyBuff.Length];
+                var read = pyBuff.Read(buff, 0, (int)pyBuff.Length);
+                if (read != pyBuff.Length)
+                {
+                    Debug.Assert(false);
+                    return null;
+                }
+
+                return buff;
+            }
+        }
+
+        public void FromBytes(byte[] bytes)
+        {
+            using (Py.GIL())
+            {
+                var pyObj = bytes.ToPython();
+                _doc.from_bytes(pyObj);
             }
         }
     }
