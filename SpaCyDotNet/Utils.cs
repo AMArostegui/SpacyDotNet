@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -105,6 +106,22 @@ namespace SpacyDotNet
                 }
                 return lstMember;
             }
+        }
+
+        public static byte[] GetBytes(dynamic dpyBytes)
+        {
+            var pyBytes = (PyObject)dpyBytes;
+            var pyBuff = pyBytes.GetBuffer();
+
+            var buff = new byte[pyBuff.Length];
+            var read = pyBuff.Read(buff, 0, (int)pyBuff.Length);
+            if (read != pyBuff.Length)
+            {
+                Debug.Assert(false);
+                return null;
+            }
+
+            return buff;
         }
     }
 }

@@ -109,19 +109,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                dynamic dpyBytes = _doc.to_bytes();
-                var pyBytes = (PyObject)dpyBytes;
-                var pyBuff = pyBytes.GetBuffer();
-
-                var buff = new byte[pyBuff.Length];
-                var read = pyBuff.Read(buff, 0, (int)pyBuff.Length);
-                if (read != pyBuff.Length)
-                {
-                    Debug.Assert(false);
-                    return null;
-                }
-
-                return buff;
+                return Utils.GetBytes(_doc.to_bytes());
             }
         }
 

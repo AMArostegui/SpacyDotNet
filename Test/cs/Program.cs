@@ -18,9 +18,9 @@ namespace Test
         {
             PythonRuntimeUtils.Init(cliOps.PathVirtualEnv);
 
-            //ExampleES.Run();
-            SpaCy101.Run();
-            //DisplaCy.Run();
+            // SpaCy101.Run();
+            Serialization.Run();
+            // DisplaCy.Run();
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

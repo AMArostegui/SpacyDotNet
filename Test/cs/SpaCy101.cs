@@ -45,19 +45,6 @@ namespace Test
                 var lexeme = doc.Vocab[word.Text];
                 Console.WriteLine($@"{lexeme.Text} {lexeme.Orth} {lexeme.Shape} {lexeme.Prefix} {lexeme.Suffix} {lexeme.IsAlpha} {lexeme.IsDigit} {lexeme.IsTitle} {lexeme.Lang}");
             }
-
-            //doc.ToDisk("doc.out");
-            byte[] docBytes = doc.ToBytes();
-            var doc2 = new Doc(new Vocab());
-            //doc2.FromDisk("doc.out");
-            doc2.FromBytes(docBytes);
-
-            Console.WriteLine("");
-            foreach (Token word2 in doc2.Tokens)
-            {
-                var lexeme2 = doc2.Vocab[word2.Text];
-                Console.WriteLine($@"{lexeme2.Text} {lexeme2.Orth} {lexeme2.Shape} {lexeme2.Prefix} {lexeme2.Suffix} {lexeme2.IsAlpha} {lexeme2.IsDigit} {lexeme2.IsTitle} {lexeme2.Lang}");
-            }
         }
     }
 }

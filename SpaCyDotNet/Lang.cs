@@ -31,5 +31,13 @@ namespace SpacyDotNet
                 return Utils.GetString(_lang.pipe_names, ref _pipeNames);
             }
         }
+
+        public Vocab Vocab
+        {
+            get
+            {
+                return new Vocab(_lang.vocab);
+            }
+        }
     }
 }
