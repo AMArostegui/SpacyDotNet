@@ -20,8 +20,11 @@ namespace SpacyDotNet
         /// Fixing Python.NET itself would be better but for now, I'm just going to copy sys.path
         /// </summary>
         /// <param name="pathVirtualEnv">Path to virtual environment</param>        
-        public static void Init(string pathVirtualEnv)
+        public static void Init(string interpreter, string pathVirtualEnv)
         {
+            // SeeCliOptions.Interpreter
+            Runtime.PythonDLL = interpreter;
+
             if (string.IsNullOrEmpty(pathVirtualEnv))
                 throw new Exception("You need to define PathVirtualEnv before using the wrapper");
             if (!Directory.Exists(pathVirtualEnv))
@@ -51,16 +54,6 @@ namespace SpacyDotNet
 
             Environment.SetEnvironmentVariable("PYTHONPATH", pythonPath, EnvironmentVariableTarget.Process);
             PythonEngine.PythonPath = pythonPath;
-        }
-
-        public static void InitOfficial(string pathBase, string pathVirtualEnv)
-        {
-            Environment.SetEnvironmentVariable("PATH", pathVirtualEnv, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("PYTHONHOME", pathVirtualEnv, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("PYTHONPATH", $"{pathVirtualEnv}\\Lib\\site-packages;{pathBase}\\Lib", EnvironmentVariableTarget.Process);
-
-            PythonEngine.PythonHome = pathVirtualEnv;
-            PythonEngine.PythonPath = Environment.GetEnvironmentVariable("PYTHONPATH", EnvironmentVariableTarget.Process);
         }
     }
 }

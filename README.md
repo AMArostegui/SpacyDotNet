@@ -4,45 +4,86 @@ SpacyDotNet is a .NET wrapper for the popular natural language library [spaCy](h
 
 ## Project scope and limitations
 
-This is not meant to be a complete and exhaustive implementation of all spaCy features and [APIs](https://spacy.io/api). Altough should be enough for basic tasks, it's considered as a starting point if you need to build a complex project using spaCy in .NET 
+This project is not meant to be a complete and exhaustive implementation of all spaCy features and [APIs](https://spacy.io/api). Altough it should be enough for basic tasks, I think of it as a starting point, if the user needs to build a complex project using spaCy in .NET 
 
-Most of the basic features in _Spacy101 section_ of the project docs are available. All **Containers** classes are present (_Doc_, _Token_, _Span_ and _Lexeme_) with their basic properties/methods running and also _Vocab_ and _StringStore_ in a limited form.
+Most of the basic features in _Spacy101 section_ of the docs are available. All **Containers** classes are present (_Doc_, _Token_, _Span_ and _Lexeme_) with their basic properties/methods running and also _Vocab_ and _StringStore_ in a limited form.
 
 Furthermore, any developer should be ready to add the missing properties or classes in a very straightforward manner.
 
-## Setup
+## Requirements
 
 This projects relies on [Python.NET](http://pythonnet.github.io/) to interop with spaCy, which is written in Python/Cython.
 
-It's been tested under **Windows 10** and **Ubuntu Linux 20.04**. Furthermore, dependency versions are shown below
+It's been tested under **Windows 10** and **Ubuntu Linux 20.04**, using the following environment
 
 - .NET Core 3.1 / .NET Standard 2.0
-- spaCy 2.3.5
-- Python 3.7
-- Python.NET 3.0.3 (NuGet: [LostTech.Python.Runtime](https://www.nuget.org/packages/LostTech.Python.Runtime/))
+- spaCy 3.0.5
+- Python 3.8
+- Python.NET: Latest official NuGet: [3.0.0-preview2021-04-03](https://www.nuget.org/packages/pythonnet/3.0.0-preview2021-04-03)
 
-Depending on the dependency, it will likely work with other versions:
+Furthermore, it might work under different libraries:
 
-- It should work with .NET Core 3.0, but .NET 5.0 is a major release and I can`t really tell.
-- It should work with any other spaCy version that changes only its minor/patch version number
-- Python.NET 3.0.3 has been compiled against Python 3.7 so the virtual environment must run under this version. In general we should honor the specified Python.NET compiled CPython version
+- .NET Core 3.0 should be fine. .NET 5.0 is a major release that I haven't tried so far. I haven't tried .NET Framework either
+- It should work with spaCy 2.3.5 and any other spaCy version that changes only its minor/patch version number
 
-### 1) Create a virtual environment and install spaCy
+The current version of Python.NET has been compiled against Python 3.8 so the virtual environment must be created under this version. In general we should honor the specified Python.NET compiled CPython version
+
+## Setup
+
+### 1) Create a Python virtual environment and install spaCy
 
 It's advised to create a virtual environment to install spaCy. Depending on the host system this is done in different ways.
 
-The spaCy official [installation guide](https://spacy.io/usage) is fine, but keep in mind Python 3.7 restriction.
+The spaCy official [installation guide](https://spacy.io/usage) is fine, but keep in mind Python 3.8 restriction.
 
-### 2) Run the examples
+To run the examples, we'll also need to install the correspoding language package (_es_core_news_sm_) as shown in the guide.
 
-The provided example expect a command line parameter, that points to the path where the virtual environment lives
+### 2) Check for Python shared library
 
-If using the CLI to run .NET, (Linux), we should simply browse to _Test/cs_ folder and:
+Python.NET makes use of Python as a shared library. Sadly, seems like the shared library is not copied with recent versions of _virtualenv_ and it's not even distributed in some flavours of Linux/Python >= 3.8
 
-- First, compile the project with `dotnet build` 
-- Then, run the example with `dotnet run --venv <path_to_virtualenv>'`
+While I don't understand the rationale behind those changes, we should check the following:
 
-If using Visual Studio, just load _Test.sln_ file, set _--venv <path_to_virtualenv>_ argument in project properties and run the solution.
+**Windows**
+
+Check whether _python38.dll_ in located under _<venv_root>\Scripts_ folder. Otherwise, go to your main Python folder and copy all dlls. In my case: _python3.dll_, _python38.dll_ and the _vcruntime140.dll_
+
+**Linux**
+
+Check whether a libpython shared object is located under _<venv_root>/bin_ folder.
+
+If not, we first need to check if the shared object is present on our system. [find_libpython](https://pypi.org/project/find-libpython/) can help with this task.
+
+If library is nowhere to be found, it's likely that installing _python-dev_ package with the package manager of your favorite distribution will place the file in your system.
+
+Once we locate the library, drop it to the _bin_ folder. In my case, the file is named _libpython3.8.so.1.0_
+
+## Usage
+
+SpaCyDotNet is built to be used as a library. However I provide an example project as a CLI program.
+
+### 1) Compile and Build
+
+If using the CLI to run .NET, (Linux), we should simply browse to _Test/cs_ folder and compile the project with `dotnet build`. Under Visual Studio, just load _Test.sln_ solution
+
+### 2) Run the project
+
+The program expects two parameters
+
+- **interpreter:** Name of Python shared library file. Usually _python38.dll_ on Windows, _libpython3.8.so_ on Linux and _libpython3.8.dylib_ on Mac
+- **venv:** Location of the virtual environment create with python 3.8 and a spaCy version
+
+Run the example with `dotnet run --interpreter <name_of_intepreter> --venv <path_to_virtualenv>'` or if using Visual Studio, set the command line in _Project => Properties => Debug => Application arguments_
+
+In my case:
+
+**Linux**
+
+    `dotnet run --interpreter libpython3.8.so.1.0 --venv /home/user/Dev/venvSpaCyPy38`
+
+**Windows**
+
+    `dotnet run --interpreter python38.dll --venv C:\Users\user\Dev\venvSpaCyPy38`
 
 ## Code comparison
 

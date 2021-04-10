@@ -16,7 +16,7 @@ namespace Test
 
         static void RunOptions(CliOptions cliOps)
         {
-            PythonRuntimeUtils.Init(cliOps.PathVirtualEnv);
+            PythonRuntimeUtils.Init(cliOps.Interpreter, cliOps.PathVirtualEnv);
 
             //ExampleES.Run();
             SpaCy101.Run();
@@ -30,8 +30,8 @@ namespace Test
 
         public class CliOptions
         {
-            [Option("base", Required = false, HelpText = "Set base intepreter path. Useful mostly to try the 'official' initiaization code")]
-            public string PathBase { get; set; }
+            [Option("interpreter", Required = true, HelpText = "Filename for the interpreter. Usually python38.dll on Windows, libpython3.8.so on Linux and libpython3.8.dylib on Mac.")]
+            public string Interpreter { get; set; }
 
             [Option("venv", Required = true, HelpText = "Set virtual environment path")]
             public string PathVirtualEnv { get; set; }
