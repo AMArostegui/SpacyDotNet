@@ -30,7 +30,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_span.text, ref _text);
+                return ToPythonHelpers.GetString(_span.text, ref _text);
             }
         }
 
@@ -38,7 +38,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_span.label_, ref _label);
+                return ToPythonHelpers.GetString(_span.label_, ref _label);
             }
         }
 
@@ -46,7 +46,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetInt(_span.start_char, ref _startChar);
+                return ToPythonHelpers.GetInt(_span.start_char, ref _startChar);
             }
         }
 
@@ -54,7 +54,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetInt(_span.end_char, ref _endChar);
+                return ToPythonHelpers.GetInt(_span.end_char, ref _endChar);
             }
         }
     }

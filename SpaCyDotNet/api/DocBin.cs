@@ -9,7 +9,16 @@ namespace SpacyDotNet
     {
         private dynamic _docBin;
 
-        public DocBin(string[] attrs = null, bool storeUserData = false)
+        public DocBin()
+        {
+            using (Py.GIL())
+            {
+                dynamic spacy = Py.Import("spacy");
+                _docBin = spacy.tokens.DocBin.__call__();
+            }
+        }
+
+        public DocBin(string[] attrs, bool storeUserData)
         {
             using (Py.GIL())
             {
@@ -25,7 +34,7 @@ namespace SpacyDotNet
 
                 var pyStoreUserDate = new PyInt(storeUserData ? 1 : 0);
                 dynamic spacy = Py.Import("spacy");
-                _docBin = spacy.tokens.DocBin.__call__(attrs == null ? Runtime.None : pyAttrs, pyStoreUserDate);
+                _docBin = spacy.tokens.DocBin.__call__(pyAttrs, pyStoreUserDate);
             }
         }
 
@@ -42,7 +51,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                return Utils.GetBytes(_docBin.to_bytes());
+                return ToPythonHelpers.GetBytes(_docBin.to_bytes());
             }
         }
 
@@ -50,26 +59,8 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var jare = new byte[bytes.Length];
-                bytes.CopyTo(jare, 0);
-
-                //var pyObj = bytes.ToPython();
-                var pyObj = jare.ToPython();
-
-                //var kaka = new PyList();
-                //var kakaBuff = kaka.GetBuffer();
-                //kakaBuff.Write(bytes, 0, bytes.Length);
-
-                var kakaBuff = pyObj.GetBuffer();
-                //kakaBuff.Write(bytes, 0, bytes.Length);
-
-                dynamic zlib = Py.Import("zlib");
-                dynamic kakak = zlib.decompress(kakaBuff);
-                
-
-
-                
-                //_docBin.from_bytes(pyObj);
+                var pyObj = ToDotNetHelpers.GetBytes(bytes);                
+                _docBin.from_bytes(pyObj);
             }
         }
 
@@ -77,7 +68,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                dynamic pyDocs = _docBin.get_docs(vocab.PyObj());
+                dynamic pyDocs = _docBin.get_docs(vocab.PyObj);
 
                 var docs = new List<Doc>();
                 while (true)

@@ -49,7 +49,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.text, ref _text);
+                return ToPythonHelpers.GetString(_token.text, ref _text);
             }
         }
 
@@ -57,7 +57,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.lemma_, ref _lemma);
+                return ToPythonHelpers.GetString(_token.lemma_, ref _lemma);
             }
         }
 
@@ -65,7 +65,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.pos_, ref _pos);
+                return ToPythonHelpers.GetString(_token.pos_, ref _pos);
             }
         }
 
@@ -73,7 +73,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.tag_, ref _tag);
+                return ToPythonHelpers.GetString(_token.tag_, ref _tag);
             }
         }
 
@@ -81,7 +81,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.dep_, ref _dep);
+                return ToPythonHelpers.GetString(_token.dep_, ref _dep);
             }
         }
 
@@ -89,7 +89,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_token.shape_, ref _shape);
+                return ToPythonHelpers.GetString(_token.shape_, ref _shape);
             }
         }
 
@@ -97,7 +97,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.is_alpha, ref _isAlpha);
+                return ToPythonHelpers.GetBool(_token.is_alpha, ref _isAlpha);
             }
         }
 
@@ -105,7 +105,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.is_stop, ref _isStop);
+                return ToPythonHelpers.GetBool(_token.is_stop, ref _isStop);
             }
         }
 
@@ -113,7 +113,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.is_punct, ref _isPunct);
+                return ToPythonHelpers.GetBool(_token.is_punct, ref _isPunct);
             }
         }
 
@@ -121,7 +121,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.is_digit, ref _isDigit);
+                return ToPythonHelpers.GetBool(_token.is_digit, ref _isDigit);
             }
         }
 
@@ -129,7 +129,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.like_num, ref _likeNum);
+                return ToPythonHelpers.GetBool(_token.like_num, ref _likeNum);
             }
         }
 
@@ -137,7 +137,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.like_email, ref _likeEMail);
+                return ToPythonHelpers.GetBool(_token.like_email, ref _likeEMail);
             }
         }
 
@@ -145,7 +145,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.has_vector, ref _hasVector);
+                return ToPythonHelpers.GetBool(_token.has_vector, ref _hasVector);
             }
         }
 
@@ -153,7 +153,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetDouble(_token.vector_norm, ref _vectorNorm);
+                return ToPythonHelpers.GetDouble(_token.vector_norm, ref _vectorNorm);
             }
         }
 
@@ -161,7 +161,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetBool(_token.is_oov, ref _isOov);
+                return ToPythonHelpers.GetBool(_token.is_oov, ref _isOov);
             }
         }
 

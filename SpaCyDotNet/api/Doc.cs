@@ -43,7 +43,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetList(_doc, ref _tokens);
+                return ToPythonHelpers.GetList(_doc, ref _tokens);
             }
         }
 
@@ -51,7 +51,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetList(_doc.sents, ref _sentences);
+                return ToPythonHelpers.GetList(_doc.sents, ref _sentences);
             }
         }
 
@@ -59,7 +59,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetList(_doc.noun_chunks, ref _nounChunks);
+                return ToPythonHelpers.GetList(_doc.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -67,7 +67,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetList(_doc.ents, ref _ents);
+                return ToPythonHelpers.GetList(_doc.ents, ref _ents);
             }
         }
 
@@ -109,7 +109,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                return Utils.GetBytes(_doc.to_bytes());
+                return ToPythonHelpers.GetBytes(_doc.to_bytes());
             }
         }
 
@@ -117,18 +117,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                // Seems like ToPython method doesn't convert properly in the case of a byte array
-                // The lines below throw:
-                //      Python.Runtime.PythonException: 'TypeError : a bytes-like object is required, not 'Byte[]''
-                // var pyObj = bytes.ToPython();
-                // _doc.from_bytes(pyObj);
-
-                // We need to make use of builtin function bytes()
-                // Taken from:
-                //      https://github.com/pythonnet/pythonnet/issues/1150
-                var builtins = Py.Import("builtins");
-                var toBytesFunc = builtins.GetAttr("bytes");
-                var pyBytes = toBytesFunc.Invoke(bytes.ToPython());
+                var pyBytes = ToDotNetHelpers.GetBytes(bytes);
                 _doc.from_bytes(pyBytes);
             }
         }

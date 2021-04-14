@@ -28,7 +28,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Utils.GetString(_lang.pipe_names, ref _pipeNames);
+                return ToPythonHelpers.GetString(_lang.pipe_names, ref _pipeNames);
             }
         }
 
