@@ -6,7 +6,7 @@ SpacyDotNet is a .NET wrapper for the popular natural language library [spaCy](h
 
 This project is not meant to be a complete and exhaustive implementation of all spaCy features and [APIs](https://spacy.io/api). Altough it should be enough for basic tasks, I think of it as a starting point, if the user needs to build a complex project using spaCy in .NET 
 
-Most of the basic features in _Spacy101 section_ of the docs are available. All **Containers** classes are present (_Doc_, _Token_, _Span_ and _Lexeme_) with their basic properties/methods running and also _Vocab_ and _StringStore_ in a limited form.
+Most of the basic features in _Spacy101 section_ of the docs are available. All **Containers** classes are present (_Doc_, _DocBin_, _Token_, _Span_ and _Lexeme_) with their basic properties/methods running and also _Vocab_ and _StringStore_ in a limited form.
 
 Furthermore, any developer should be ready to add the missing properties or classes in a very straightforward manner.
 
@@ -73,17 +73,17 @@ The program expects two parameters
 - **interpreter:** Name of Python shared library file. Usually _python38.dll_ on Windows, _libpython3.8.so_ on Linux and _libpython3.8.dylib_ on Mac
 - **venv:** Location of the virtual environment create with python 3.8 and a spaCy version
 
-Run the example with `dotnet run --interpreter <name_of_intepreter> --venv <path_to_virtualenv>'` or if using Visual Studio, set the command line in _Project => Properties => Debug => Application arguments_
+Run the example with `dotnet run --interpreter <name_of_intepreter> --venv <path_to_virtualenv>` or if using Visual Studio, set the command line in _Project => Properties => Debug => Application arguments_
 
 In my case:
 
 **Linux**
 
-    `dotnet run --interpreter libpython3.8.so.1.0 --venv /home/user/Dev/venvSpaCyPy38`
+    dotnet run --interpreter libpython3.8.so.1.0 --venv /home/user/Dev/venvSpaCyPy38
 
 **Windows**
 
-    `dotnet run --interpreter python38.dll --venv C:\Users\user\Dev\venvSpaCyPy38`
+    dotnet run --interpreter python38.dll --venv C:\Users\user\Dev\venvSpaCyPy38
 
 ## Code comparison
 
