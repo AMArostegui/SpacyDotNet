@@ -18,8 +18,8 @@ namespace Test
         {
             PythonRuntimeUtils.Init(cliOps.Interpreter, cliOps.PathVirtualEnv);
 
-            // SpaCy101.Run();
-            Serialization.Run();
+            SpaCy101.Run();
+            // Serialization.Run();
             // DisplaCy.Run();
         }
 
