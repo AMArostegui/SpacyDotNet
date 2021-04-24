@@ -64,6 +64,24 @@ namespace SpacyDotNet
             }
         }
 
+        public void ToDisk(string pathFile)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(pathFile);
+                _docBin.to_disk(pyPath);
+            }
+        }
+
+        public void FromDisk(string pathFile)
+        {
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(pathFile);
+                _docBin.from_disk(pyPath);
+            }
+        }
+
         public Doc[] GetDocs(Vocab vocab)
         {
             using (Py.GIL())
