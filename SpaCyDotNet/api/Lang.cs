@@ -1,4 +1,6 @@
-﻿using Python.Runtime;
+﻿using System.Collections.Generic;
+using System.Text;
+using Python.Runtime;
 
 namespace SpacyDotNet
 {
@@ -6,7 +8,7 @@ namespace SpacyDotNet
     {
         private dynamic _lang;
 
-        private string _pipeNames;
+        private List<string> _pipeNames;
 
         internal Lang(dynamic lang)
         {
@@ -24,11 +26,11 @@ namespace SpacyDotNet
             }
         }
 
-        public string PipeNames
+        public List<string> PipeNames
         {
             get
             {
-                return ToPythonHelpers.GetString(_lang.pipe_names, ref _pipeNames);
+                return ToPythonHelpers.GetListBuiltInType<string>(_lang.pipe_names, ref _pipeNames);
             }
         }
 

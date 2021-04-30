@@ -75,8 +75,7 @@ namespace SpacyDotNet
             }
         }
 
-
-        public static List<T> GetList<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
+        public static List<T> GetListWrapperObj<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
         {
             if (lstMember != null)
                 return lstMember;
@@ -98,6 +97,45 @@ namespace SpacyDotNet
                         var parameters = new object[] { element };
 
                         lstMember.Add((T)Activator.CreateInstance(typeof(T), flags, binder, parameters, culture));
+                    }
+                    catch (PythonException)
+                    {
+                        break;
+                    }
+                }
+                return lstMember;
+            }
+        }
+
+        public static List<T> GetListBuiltInType<T>(dynamic dynIterPy, ref List<T> lstMember)
+        {
+            if (lstMember != null)
+                return lstMember;
+
+            using (Py.GIL())
+            {
+                lstMember = new List<T>();
+
+                var iter = dynIterPy.__iter__();
+                while (true)
+                {
+                    try
+                    {
+                        var element = iter.__next__();
+
+                        object created = null;
+                        if (typeof(T) == typeof(string))
+                        {
+                            var pyObj = new PyString(element);
+                            created = pyObj.ToString();
+                        }
+                        else
+                        {
+                            Debug.Assert(false);
+                            return null;
+                        }                            
+
+                        lstMember.Add((T)created);
                     }
                     catch (PythonException)
                     {

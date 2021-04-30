@@ -43,7 +43,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetList(_doc, ref _tokens);
+                return ToPythonHelpers.GetListWrapperObj(_doc, ref _tokens);
             }
         }
 
@@ -51,7 +51,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetList(_doc.sents, ref _sentences);
+                return ToPythonHelpers.GetListWrapperObj(_doc.sents, ref _sentences);
             }
         }
 
@@ -59,7 +59,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetList(_doc.noun_chunks, ref _nounChunks);
+                return ToPythonHelpers.GetListWrapperObj(_doc.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -67,7 +67,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetList(_doc.ents, ref _ents);
+                return ToPythonHelpers.GetListWrapperObj(_doc.ents, ref _ents);
             }
         }
 

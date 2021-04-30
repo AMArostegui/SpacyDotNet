@@ -20,7 +20,7 @@ namespace Test
             var doc = nlp.GetDocument(text);
 
             Console.WriteLine("Pipeline:");
-            Console.WriteLine(nlp.PipeNames);
+            Console.WriteLine(string.Join(",", nlp.PipeNames));
             Console.WriteLine(separator);
 
             Console.WriteLine("Tokenization");
