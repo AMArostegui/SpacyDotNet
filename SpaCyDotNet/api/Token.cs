@@ -1,4 +1,5 @@
-﻿using Python.Runtime;
+﻿using System.Collections.Generic;
+using Python.Runtime;
 
 namespace SpacyDotNet
 {
@@ -24,6 +25,9 @@ namespace SpacyDotNet
         private bool? _hasVector;
         private double? _vectorNorm;
         private bool? _isOov;
+
+        private Token _head;
+        private List<Token> _children;
 
         public Token()
         {
@@ -165,6 +169,29 @@ namespace SpacyDotNet
             }
         }
 
+        public Token Head
+        {
+            get
+            {
+                if (_head != null)
+                    return _head;
+
+                using (Py.GIL())
+                {
+                    _head = new Token(_token.head);
+                    return _head;
+                }
+            }
+        }
+
+        public List<Token> Children
+        {
+            get
+            {
+                return ToPythonHelpers.GetListWrapperObj(_token.children, ref _children);
+            }
+        }
+
         public double Similarity(Token token)
         {
             using (Py.GIL())
@@ -173,6 +200,11 @@ namespace SpacyDotNet
                 var similarityPyFloat = PyFloat.AsFloat(similarityPy);
                 return similarityPyFloat.As<double>();
             }
+        }
+
+        public override string ToString()
+        {
+            return Text;
         }
     }
 }

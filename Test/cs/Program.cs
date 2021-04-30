@@ -19,6 +19,7 @@ namespace Test
             PythonRuntimeUtils.Init(cliOps.Interpreter, cliOps.PathVirtualEnv);
 
             SpaCy101.Run();
+            // LinguisticFeatures.Run();
             // ExampleES.Run();
             // Serialization.Run();
             // DisplaCy.Run();
