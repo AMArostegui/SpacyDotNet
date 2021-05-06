@@ -1,11 +1,8 @@
-﻿using System.ComponentModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Python.Runtime;
-using System.Diagnostics;
 
 namespace SpacyDotNet
 {
-    [DefaultProperty("Tokens")]
     public class Doc
     {
         private dynamic _doc;

@@ -19,7 +19,7 @@ print("")
 print_doc(doc_base)
 
 # Serialize document to disk and bytes
-doc_base.to_disk("doc.out")
+doc_base.to_disk("doc.spacy")
 doc_base_bytes = doc_base.to_bytes()
 
 # Serialize using DocBin
@@ -29,7 +29,7 @@ docbin_base_bytes = docbin_base.to_bytes()
 
 # Restore document from disk
 doc = Doc(Vocab())
-doc.from_disk("doc.out")
+doc.from_disk("doc.spacy")
 print("")
 print_doc(doc)
 
