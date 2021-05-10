@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using Python.Runtime;
@@ -72,6 +73,22 @@ namespace SpacyDotNet
                 var longPy = new PyLong(dynLongPyObj);
                 longMember = longPy.ToInt64();
                 return (long)longMember;
+            }
+        }
+
+        public static BigInteger GetBigInteger(dynamic dynLongPyObj, ref BigInteger? bigInt)
+        {
+            if (bigInt != null)
+                return (BigInteger)bigInt;
+
+            using (Py.GIL())
+            {                
+                var pyLong = new PyLong(dynLongPyObj);
+
+                // This is inefficient, and should be reworked in the future
+                var str = pyLong.ToString();
+                bigInt = BigInteger.Parse(str);
+                return (BigInteger)bigInt;
             }
         }
 

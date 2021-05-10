@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Python.Runtime;
 
 namespace SpacyDotNet
@@ -8,14 +9,14 @@ namespace SpacyDotNet
     {
         private dynamic _stringStore;
 
-        private Dictionary<string, long> _dictStrToLong;
-        private Dictionary<long, string> _dictLongToStr;
+        private Dictionary<string, BigInteger> _dictStrToNumber;
+        private Dictionary<BigInteger, string> _dictNumberToStr;
 
         internal StringStore(dynamic stringStore)
         {
             _stringStore = stringStore;
-            _dictStrToLong = new Dictionary<string, long>();
-            _dictLongToStr = new Dictionary<long, string>();            
+            _dictStrToNumber = new Dictionary<string, BigInteger>();
+            _dictNumberToStr = new Dictionary<BigInteger, string>();            
         }
 
         public object this[object key]
@@ -25,27 +26,27 @@ namespace SpacyDotNet
                 var keyStr = key as string;
                 if (keyStr != null)
                 {                    
-                    if (_dictStrToLong.ContainsKey(keyStr))
-                        return _dictStrToLong[keyStr];
+                    if (_dictStrToNumber.ContainsKey(keyStr))
+                        return _dictStrToNumber[keyStr];
 
-                    long valHash = 0;
+                    BigInteger valHash;
                     using (Py.GIL())
                     {
                         var dynPyNumber = _stringStore.__getitem__(key);
-                        var pyNumber = new PyInt(dynPyNumber);
-                        valHash = pyNumber.As<long>();
-                        _dictStrToLong.Add(keyStr, valHash);
+                        var pyNumber = new PyLong(dynPyNumber);
+                        valHash = BigInteger.Parse(pyNumber.ToString());
+                        _dictStrToNumber.Add(keyStr, valHash);
                     }
 
                     return valHash;
                 }
 
-                var keyHashN = key as long?;
+                var keyHashN = key as BigInteger?;
                 if (keyHashN != null)
                 {
-                    var keyHash = (long)keyHashN;
-                    if (_dictLongToStr.ContainsKey(keyHash))
-                        return _dictLongToStr[keyHash];
+                    var keyHash = (BigInteger)keyHashN;
+                    if (_dictNumberToStr.ContainsKey(keyHash))
+                        return _dictNumberToStr[keyHash];
 
                     var valStr = string.Empty;
                     using (Py.GIL())
@@ -53,7 +54,7 @@ namespace SpacyDotNet
                         var dynPyStr = _stringStore.__getitem__(key);
                         var pyString = new PyString(dynPyStr);
                         valStr = pyString.ToString();
-                        _dictLongToStr.Add(keyHash, valStr);
+                        _dictNumberToStr.Add(keyHash, valStr);
                     }
 
                     return valStr;

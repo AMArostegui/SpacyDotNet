@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.Serialization;
 using Python.Runtime;
 
@@ -11,7 +12,7 @@ namespace SpacyDotNet
         private dynamic _vocab;
 
         private Dictionary<string, Lexeme> _dictStr2Lex = new Dictionary<string, Lexeme>();
-        private Dictionary<long, Lexeme> _dictLong2Lex = new Dictionary<long, Lexeme>();
+        private Dictionary<BigInteger, Lexeme> _dictLong2Lex = new Dictionary<BigInteger, Lexeme>();
         private StringStore _stringStore = null;
 
         public Vocab()
@@ -56,10 +57,10 @@ namespace SpacyDotNet
                     return lexeme;
                 }
 
-                var keyHashN = key as long?;
+                var keyHashN = key as BigInteger?;
                 if (keyHashN != null)
                 {
-                    var keyHash = (long)keyHashN;
+                    var keyHash = (BigInteger)keyHashN;
                     if (_dictLong2Lex.ContainsKey(keyHash))
                         return _dictLong2Lex[keyHash];
 

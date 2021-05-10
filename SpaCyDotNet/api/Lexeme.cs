@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Runtime.Serialization;
 
 namespace SpacyDotNet
@@ -14,7 +15,7 @@ namespace SpacyDotNet
         private string _suffix;
         private string _lang;
 
-        private long? _orth;
+        private BigInteger? _orth;
 
         private bool? _isAlpha;
         private bool? _isDigit;
@@ -81,14 +82,13 @@ namespace SpacyDotNet
             }
         }
 
-        public long Orth
+        public BigInteger Orth
         {
             get
             {
-                return ToPythonHelpers.GetLong(_lexeme.orth, ref _orth);
+                return ToPythonHelpers.GetBigInteger(_lexeme.orth, ref _orth);
             }
         }
-
 
         public bool IsAlpha
         {
