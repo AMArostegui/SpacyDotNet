@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace SpacyDotNet
 {
-    public class Lexeme
+    [Serializable]
+    public class Lexeme : ISerializable
     {
         private dynamic _lexeme;
 
@@ -19,6 +19,11 @@ namespace SpacyDotNet
         private bool? _isAlpha;
         private bool? _isDigit;
         private bool? _isTitle;
+
+        public Lexeme()
+        {
+            // Needed to implement ISerializable
+        }
 
         internal Lexeme(dynamic lexeme)
         {
@@ -107,6 +112,22 @@ namespace SpacyDotNet
             {
                 return ToPythonHelpers.GetBool(_lexeme.is_title, ref _isTitle);
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Using the property is important form the members to be loaded
+            info.AddValue("Text", Text);
+            info.AddValue("Shape", Shape);
+            info.AddValue("Prefix", Prefix);
+            info.AddValue("Suffix", Suffix);
+            info.AddValue("Lang", Lang);
+
+            info.AddValue("Orth", Orth);
+
+            info.AddValue("IsAlpha", IsAlpha);
+            info.AddValue("IsDigit", IsDigit);
+            info.AddValue("IsTitle", IsTitle);
         }
     }
 }

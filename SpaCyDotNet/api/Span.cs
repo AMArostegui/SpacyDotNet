@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Python.Runtime;
+using System.Runtime.Serialization;
 
 namespace SpacyDotNet
 {
-    public class Span
+    [Serializable]
+    public class Span : ISerializable
     {
         private dynamic _span;
 
@@ -16,7 +15,7 @@ namespace SpacyDotNet
 
         public Span()
         {
-            // Needed just to use generics
+            // Needed to use generics and to implement ISerializable
         }
 
         internal Span(dynamic sentence)
@@ -56,6 +55,15 @@ namespace SpacyDotNet
             {
                 return ToPythonHelpers.GetInt(_span.end_char, ref _endChar);
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Using the property is important form the members to be loaded
+            info.AddValue("Text", Text);
+            info.AddValue("Label", Label);
+            info.AddValue("StartChar", StartChar);
+            info.AddValue("EndChar", EndChar);
         }
     }
 }

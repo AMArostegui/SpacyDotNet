@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class Vocab
+    [Serializable]
+    public class Vocab : ISerializable
     {
         private dynamic _vocab;
 
@@ -109,6 +110,10 @@ namespace SpacyDotNet
                 var pyPath = new PyString(path);
                 _vocab.from_disk(pyPath);
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class Doc
+    [Serializable]
+    public class Doc : ISerializable
     {
         private dynamic _doc;
 
@@ -14,6 +17,11 @@ namespace SpacyDotNet
         private List<Span> _sentences;
         private List<Span> _nounChunks;
         private List<Span> _ents;
+
+        public Doc()
+        {
+            // Needed for ISerializable interface
+        }
 
         public Doc(Vocab vocab)
         {
@@ -117,6 +125,15 @@ namespace SpacyDotNet
                 var pyBytes = ToDotNetHelpers.GetBytes(bytes);
                 _doc.from_bytes(pyBytes);
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Using the property is important form the members to be loaded
+            info.AddValue("Tokens", Tokens);
+            info.AddValue("Sentences", Sents);
+            info.AddValue("NounChunks", NounChunks);
+            info.AddValue("Ents", Ents);
         }
     }
 }

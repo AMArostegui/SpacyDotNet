@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class Token
+    [Serializable]
+    public class Token : ISerializable
     {
         private dynamic _token;
 
@@ -31,7 +34,7 @@ namespace SpacyDotNet
 
         public Token()
         {
-            // Needed just to use generics
+            // Needed to use generics and to implement ISerializable
         }
 
         internal Token(dynamic token)
@@ -205,6 +208,42 @@ namespace SpacyDotNet
         public override string ToString()
         {
             return Text;
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Using the property is important form the members to be loaded
+            info.AddValue("Text", Text);
+            info.AddValue("Lemma", Lemma);
+
+            info.AddValue("Pos", PoS);
+            info.AddValue("Tag", Tag);
+            info.AddValue("Dep", Dep);
+            info.AddValue("Shape", Shape);
+
+            info.AddValue("IsAlpha", IsAlpha);
+            info.AddValue("IsStop", IsStop);
+            info.AddValue("IsPunct", IsPunct);
+            info.AddValue("IsDigit", IsDigit);
+            info.AddValue("LikeNum", LikeNum);
+            info.AddValue("LikeEMail", LikeEMail);
+
+            info.AddValue("HasVector", HasVector);
+            info.AddValue("VectorNorm", VectorNorm);
+            info.AddValue("IsOov", IsOov);
+            
+            var headIsSelf = false;
+            var pyHead = Head.PyObj;
+            using (Py.GIL())
+            {
+                var pyHeadIsSelf = new PyInt(_token.__eq__(pyHead));
+                headIsSelf = pyHeadIsSelf.ToInt32() != 0;
+            }
+
+            // TODO: This needs to be reviewed
+            if (!headIsSelf)
+                info.AddValue("Head", Head);
+            //info.AddValue("Children", Children);
         }
     }
 }

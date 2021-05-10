@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class Lang
+    [Serializable]
+    public class Lang : ISerializable
     {
         private dynamic _lang;
 
@@ -40,6 +42,12 @@ namespace SpacyDotNet
             {
                 return new Vocab(_lang.vocab);
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            // Using the property is important form the members to be loaded
+            info.AddValue("PipeNames", PipeNames);
         }
     }
 }
