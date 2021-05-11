@@ -27,6 +27,10 @@ namespace SpacyDotNet
             }
         }
 
+        protected Vocab(SerializationInfo info, StreamingContext context)
+        {
+        }
+
         internal Vocab(dynamic vocab)
         {
             _vocab = vocab;

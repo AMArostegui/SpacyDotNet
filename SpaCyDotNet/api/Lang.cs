@@ -18,6 +18,12 @@ namespace SpacyDotNet
             _pipeNames = null;
         }
 
+        protected Lang(SerializationInfo info, StreamingContext context)
+        {
+            var temp = new List<string>();
+            _pipeNames = (List<string>)info.GetValue("Sentences", temp.GetType());
+        }
+
         public Doc GetDocument(string text)
         {
             using (Py.GIL())

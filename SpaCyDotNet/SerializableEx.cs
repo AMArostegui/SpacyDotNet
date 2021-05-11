@@ -21,6 +21,17 @@ namespace SpacyDotNet
 
         public byte[] Native { get => _native; }
         public byte[] Wrapper { get => _wrapper; }
+        
+        public SerializableEx()
+        {
+        }
+
+        protected SerializableEx(SerializationInfo info, StreamingContext context)
+        {
+            var temp = new byte[1];
+            _native = (byte[])info.GetValue("Native", temp.GetType());
+            _wrapper = (byte[])info.GetValue("Wrapper", temp.GetType());
+        }
 
         public byte[] ToBytes(Doc doc)
         {

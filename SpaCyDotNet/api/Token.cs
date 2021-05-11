@@ -37,6 +37,34 @@ namespace SpacyDotNet
             // Needed to use generics and to implement ISerializable
         }
 
+        protected Token(SerializationInfo info, StreamingContext context)
+        {
+            _text = info.GetString("Text");
+            _lemma = info.GetString("Lemma");
+
+            _pos = info.GetString("Pos");
+            _tag = info.GetString("Tag");
+            _dep = info.GetString("Dep");
+            _shape = info.GetString("Shape");
+
+            var tempBool = false;
+            _isAlpha = (bool)info.GetValue("IsAlpha", tempBool.GetType());
+            _isStop = (bool)info.GetValue("IsStop", tempBool.GetType());
+            _isPunct = (bool)info.GetValue("IsPunct", tempBool.GetType());
+            _isDigit = (bool)info.GetValue("IsDigit", tempBool.GetType());
+            _likeNum = (bool)info.GetValue("LikeNum", tempBool.GetType());
+            _likeEMail = (bool)info.GetValue("LikeEMail", tempBool.GetType());
+
+            var tempDouble = 0.0;
+            _hasVector = (bool)info.GetValue("HasVector", tempBool.GetType());
+            _vectorNorm = (double)info.GetValue("VectorNorm", tempDouble.GetType());
+            _isOov = (bool)info.GetValue("IsOov", tempBool.GetType());
+
+            // TODO: This needs to be reviewed
+            //var tempToken = new Token();
+            //_head = (Token)info.GetValue("Head", tempToken.GetType());
+        }
+
         internal Token(dynamic token)
         {
             _isAlpha = null;

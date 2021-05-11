@@ -26,6 +26,23 @@ namespace SpacyDotNet
             // Needed to implement ISerializable
         }
 
+        protected Lexeme(SerializationInfo info, StreamingContext context)
+        {
+            _text = info.GetString("Text");
+            _shape = info.GetString("Shape");
+            _prefix = info.GetString("Prefix");
+            _suffix = info.GetString("Suffix");
+            _lang = info.GetString("Lang");
+
+            var tempBI = new BigInteger();
+            _orth = (BigInteger)info.GetValue("Orth", tempBI.GetType());
+
+            var tempBool = false;
+            _isAlpha = (bool)info.GetValue("IsAlpha", tempBool.GetType());
+            _isDigit = (bool)info.GetValue("IsDigit", tempBool.GetType());
+            _isTitle = (bool)info.GetValue("IsTitle", tempBool.GetType());
+        }
+
         internal Lexeme(dynamic lexeme)
         {
             _lexeme = lexeme;

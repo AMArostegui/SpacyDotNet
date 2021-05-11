@@ -23,6 +23,17 @@ namespace SpacyDotNet
             // Needed for ISerializable interface
         }
 
+        protected Doc(SerializationInfo info, StreamingContext context)
+        {
+            var tempTokens = new List<Token>();
+            _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
+
+            var tempSpan = new List<Span>();
+            _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
+            _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
+            _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+        }
+
         public Doc(Vocab vocab)
         {
             _vocab = vocab;

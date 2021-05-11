@@ -5,15 +5,6 @@ namespace Test
 {
     static class Serialization
     {
-        public static void PrintDoc(Doc adoc)
-        {
-            foreach (Token word in adoc.Tokens)
-            {
-                var lexeme = adoc.Vocab[word.Text];
-                Console.WriteLine($@"{lexeme.Text} {lexeme.Orth} {lexeme.Shape} {lexeme.Prefix} {lexeme.Suffix} {lexeme.IsAlpha} {lexeme.IsDigit} {lexeme.IsTitle} {lexeme.Lang}");
-            }
-        }
-
         public static void Run()
         {
             var spacy = new Spacy();
@@ -24,7 +15,7 @@ namespace Test
             var nlp = spacy.Load("en_core_web_sm");
             var docBase = nlp.GetDocument(text);
             Console.WriteLine("");
-            PrintDoc(docBase);
+            Misc.PrintDoc(docBase);
 
             // Serialize document to disk and bytes
             docBase.ToDisk("doc.spacy");
@@ -39,20 +30,20 @@ namespace Test
             var doc = new Doc(new Vocab());
             doc.FromDisk("doc.spacy");
             Console.WriteLine("");
-            PrintDoc(doc);
+            Misc.PrintDoc(doc);
 
             // Restore document from bytes
             doc = new Doc(new Vocab());
             doc.FromBytes(docBaseBytes);
             Console.WriteLine("");
-            PrintDoc(doc);
+            Misc.PrintDoc(doc);
 
             // Restore using DocBin
             var docBin = new DocBin();
             docBin.FromBytes(docBinBaseBytes);
             var docs = docBin.GetDocs(nlp.Vocab);
             Console.WriteLine("");
-            PrintDoc(docs[0]);
+            Misc.PrintDoc(docs[0]);
         }
     }
 }

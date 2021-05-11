@@ -18,6 +18,16 @@ namespace SpacyDotNet
             // Needed to use generics and to implement ISerializable
         }
 
+        protected Span(SerializationInfo info, StreamingContext context)
+        {
+            _text = info.GetString("Text");
+            _label = info.GetString("Label");
+
+            var temp = 0;
+            _startChar = (int)info.GetValue("StartChar", temp.GetType());
+            _endChar = (int)info.GetValue("EndChar", temp.GetType());
+        }
+
         internal Span(dynamic sentence)
         {
             _span = sentence;
