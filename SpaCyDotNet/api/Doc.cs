@@ -82,7 +82,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc.sents, ref _sentences);
+                return Helpers.GetListWrapperObj(_pyDoc?.sents, ref _sentences);
             }
         }
 
@@ -90,7 +90,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc.noun_chunks, ref _nounChunks);
+                return Helpers.GetListWrapperObj(_pyDoc?.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -98,7 +98,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc.ents, ref _ents);
+                return Helpers.GetListWrapperObj(_pyDoc?.ents, ref _ents);
             }
         }
 
