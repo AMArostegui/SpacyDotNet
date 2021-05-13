@@ -27,7 +27,7 @@ namespace Test
             PrintDoc(docBase);
 
             // Serialize document to disk and bytes
-            docBase.ToDisk("doc.spacy");
+            docBase.ToDisk("doc.bin");
             var docBaseBytes = docBase.ToBytes();
 
             // Serialize using DocBin
@@ -37,7 +37,7 @@ namespace Test
 
             // Restore document from disk
             var doc = new Doc(new Vocab());
-            doc.FromDisk("doc.spacy");
+            doc.FromDisk("doc.bin");
             Console.WriteLine("");
             PrintDoc(doc);
 
