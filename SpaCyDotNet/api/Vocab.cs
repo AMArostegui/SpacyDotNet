@@ -21,11 +21,8 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                using (Py.GIL())
-                {
-                    dynamic spacy = Py.Import("spacy");
-                    _pyVocab = spacy.vocab.Vocab.__call__();
-                }
+                dynamic spacy = Py.Import("spacy");
+                _pyVocab = spacy.vocab.Vocab.__call__();
             }
         }
 
