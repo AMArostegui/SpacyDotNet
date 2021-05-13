@@ -87,7 +87,7 @@ namespace SpacyDotNet
         }
 
         internal dynamic PyObj
-            { get { return _pyToken; } }
+            { get => _pyToken; } 
 
         public string Text
         {

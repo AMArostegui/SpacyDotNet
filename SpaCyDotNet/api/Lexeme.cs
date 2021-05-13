@@ -100,7 +100,6 @@ namespace SpacyDotNet
             }
         }
 
-
         public string Lang
         {
             get

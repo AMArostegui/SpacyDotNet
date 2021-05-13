@@ -47,7 +47,7 @@ namespace SpacyDotNet
         }
 
         internal dynamic PyObj
-            { get { return _pyVocab; } }
+            { get => _pyVocab; } 
 
         public Lexeme this[object key]
         {
