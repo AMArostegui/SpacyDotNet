@@ -3,6 +3,7 @@
 
 # SpacyDotNet
 # Direct reference to Python Runtime, rather than using a NuGet package
+binPyRt/
 SpaCyDotNet.PyRt.csproj
 Test.PyRt.csproj
 Test.PyRt.sln
