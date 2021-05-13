@@ -8,7 +8,7 @@ namespace SpacyDotNet
     [Serializable]
     public class Token : ISerializable
     {
-        private dynamic _token;
+        private dynamic _pyToken;
 
         private string _text;
         private string _lemma;
@@ -74,17 +74,17 @@ namespace SpacyDotNet
             _likeNum = null;
             _likeEMail = null;
 
-            _token = token;
+            _pyToken = token;
         }
 
         internal dynamic PyObj
-            { get { return _token; } }
+            { get { return _pyToken; } }
 
         public string Text
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.text, ref _text);
+                return ToPythonHelpers.GetString(_pyToken.text, ref _text);
             }
         }
 
@@ -92,7 +92,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.lemma_, ref _lemma);
+                return ToPythonHelpers.GetString(_pyToken.lemma_, ref _lemma);
             }
         }
 
@@ -100,7 +100,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.pos_, ref _pos);
+                return ToPythonHelpers.GetString(_pyToken.pos_, ref _pos);
             }
         }
 
@@ -108,7 +108,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.tag_, ref _tag);
+                return ToPythonHelpers.GetString(_pyToken.tag_, ref _tag);
             }
         }
 
@@ -116,7 +116,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.dep_, ref _dep);
+                return ToPythonHelpers.GetString(_pyToken.dep_, ref _dep);
             }
         }
 
@@ -124,7 +124,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_token.shape_, ref _shape);
+                return ToPythonHelpers.GetString(_pyToken.shape_, ref _shape);
             }
         }
 
@@ -132,7 +132,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.is_alpha, ref _isAlpha);
+                return ToPythonHelpers.GetBool(_pyToken.is_alpha, ref _isAlpha);
             }
         }
 
@@ -140,7 +140,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.is_stop, ref _isStop);
+                return ToPythonHelpers.GetBool(_pyToken.is_stop, ref _isStop);
             }
         }
 
@@ -148,7 +148,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.is_punct, ref _isPunct);
+                return ToPythonHelpers.GetBool(_pyToken.is_punct, ref _isPunct);
             }
         }
 
@@ -156,7 +156,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.is_digit, ref _isDigit);
+                return ToPythonHelpers.GetBool(_pyToken.is_digit, ref _isDigit);
             }
         }
 
@@ -164,7 +164,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.like_num, ref _likeNum);
+                return ToPythonHelpers.GetBool(_pyToken.like_num, ref _likeNum);
             }
         }
 
@@ -172,7 +172,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.like_email, ref _likeEMail);
+                return ToPythonHelpers.GetBool(_pyToken.like_email, ref _likeEMail);
             }
         }
 
@@ -180,7 +180,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.has_vector, ref _hasVector);
+                return ToPythonHelpers.GetBool(_pyToken.has_vector, ref _hasVector);
             }
         }
 
@@ -188,7 +188,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetDouble(_token.vector_norm, ref _vectorNorm);
+                return ToPythonHelpers.GetDouble(_pyToken.vector_norm, ref _vectorNorm);
             }
         }
 
@@ -196,7 +196,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_token.is_oov, ref _isOov);
+                return ToPythonHelpers.GetBool(_pyToken.is_oov, ref _isOov);
             }
         }
 
@@ -209,7 +209,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    _head = new Token(_token.head);
+                    _head = new Token(_pyToken.head);
                     return _head;
                 }
             }
@@ -219,7 +219,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetListWrapperObj(_token.children, ref _children);
+                return ToPythonHelpers.GetListWrapperObj(_pyToken.children, ref _children);
             }
         }
 
@@ -227,7 +227,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {                
-                dynamic similarityPy = _token.similarity(token.PyObj);
+                dynamic similarityPy = _pyToken.similarity(token.PyObj);
                 var similarityPyFloat = PyFloat.AsFloat(similarityPy);
                 return similarityPyFloat.As<double>();
             }
@@ -264,7 +264,7 @@ namespace SpacyDotNet
             var pyHead = Head.PyObj;
             using (Py.GIL())
             {
-                var pyHeadIsSelf = new PyInt(_token.__eq__(pyHead));
+                var pyHeadIsSelf = new PyInt(_pyToken.__eq__(pyHead));
                 headIsSelf = pyHeadIsSelf.ToInt32() != 0;
             }
 

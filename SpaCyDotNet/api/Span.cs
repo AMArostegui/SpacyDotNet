@@ -6,7 +6,7 @@ namespace SpacyDotNet
     [Serializable]
     public class Span : ISerializable
     {
-        private dynamic _span;
+        private dynamic _pySpan;
 
         private string _text;
         private string _label;
@@ -30,7 +30,7 @@ namespace SpacyDotNet
 
         internal Span(dynamic sentence)
         {
-            _span = sentence;
+            _pySpan = sentence;
             _startChar = null;
             _endChar = null;
         }
@@ -39,7 +39,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_span.text, ref _text);
+                return ToPythonHelpers.GetString(_pySpan.text, ref _text);
             }
         }
 
@@ -47,7 +47,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_span.label_, ref _label);
+                return ToPythonHelpers.GetString(_pySpan.label_, ref _label);
             }
         }
 
@@ -55,7 +55,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetInt(_span.start_char, ref _startChar);
+                return ToPythonHelpers.GetInt(_pySpan.start_char, ref _startChar);
             }
         }
 
@@ -63,7 +63,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetInt(_span.end_char, ref _endChar);
+                return ToPythonHelpers.GetInt(_pySpan.end_char, ref _endChar);
             }
         }
 

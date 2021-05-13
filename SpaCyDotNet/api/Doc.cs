@@ -8,7 +8,7 @@ namespace SpacyDotNet
     [Serializable]
     public class Doc : ISerializable
     {
-        private dynamic _doc;
+        private dynamic _pyDoc;
 
         private Vocab _vocab;
 
@@ -42,24 +42,24 @@ namespace SpacyDotNet
             {
                 dynamic spacy = Py.Import("spacy");
                 dynamic pyVocab = vocab.PyObj;
-                _doc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
             }
         }
 
         internal Doc(dynamic doc)
         {
-            _doc = doc;
+            _pyDoc = doc;
             _vocab = null;
         }
 
         internal dynamic PyObj
-            { get { return _doc; } }
+            { get { return _pyDoc; } }
 
         public List<Token> Tokens
         {
             get
             {
-                return ToPythonHelpers.GetListWrapperObj(_doc, ref _tokens);
+                return ToPythonHelpers.GetListWrapperObj(_pyDoc, ref _tokens);
             }
         }
 
@@ -67,7 +67,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetListWrapperObj(_doc.sents, ref _sentences);
+                return ToPythonHelpers.GetListWrapperObj(_pyDoc.sents, ref _sentences);
             }
         }
 
@@ -75,7 +75,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetListWrapperObj(_doc.noun_chunks, ref _nounChunks);
+                return ToPythonHelpers.GetListWrapperObj(_pyDoc.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -83,7 +83,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetListWrapperObj(_doc.ents, ref _ents);
+                return ToPythonHelpers.GetListWrapperObj(_pyDoc.ents, ref _ents);
             }
         }
 
@@ -96,7 +96,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    var vocab = _doc.vocab;
+                    var vocab = _pyDoc.vocab;
                     _vocab = new Vocab(vocab);
                     return _vocab;
                 }
@@ -108,7 +108,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _doc.to_disk(pyPath);
+                _pyDoc.to_disk(pyPath);
             }
         }
 
@@ -117,7 +117,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _doc.from_disk(pyPath);
+                _pyDoc.from_disk(pyPath);
             }
         }
 
@@ -125,7 +125,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                return ToPythonHelpers.GetBytes(_doc.to_bytes());
+                return ToPythonHelpers.GetBytes(_pyDoc.to_bytes());
             }
         }
 
@@ -134,7 +134,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyBytes = ToDotNetHelpers.GetBytes(bytes);
-                _doc.from_bytes(pyBytes);
+                _pyDoc.from_bytes(pyBytes);
             }
         }
 

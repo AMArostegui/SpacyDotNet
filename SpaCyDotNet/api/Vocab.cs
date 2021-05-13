@@ -9,7 +9,7 @@ namespace SpacyDotNet
     [Serializable]
     public class Vocab : ISerializable
     {
-        private dynamic _vocab;
+        private dynamic _pyVocab;
 
         private Dictionary<string, Lexeme> _dictStr2Lex = new Dictionary<string, Lexeme>();
         private Dictionary<BigInteger, Lexeme> _dictLong2Lex = new Dictionary<BigInteger, Lexeme>();
@@ -22,7 +22,7 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
-                    _vocab = spacy.vocab.Vocab.__call__();
+                    _pyVocab = spacy.vocab.Vocab.__call__();
                 }
             }
         }
@@ -33,11 +33,11 @@ namespace SpacyDotNet
 
         internal Vocab(dynamic vocab)
         {
-            _vocab = vocab;
+            _pyVocab = vocab;
         }
 
         internal dynamic PyObj
-            { get { return _vocab; } }
+            { get { return _pyVocab; } }
 
         public Lexeme this[object key]
         {
@@ -53,7 +53,7 @@ namespace SpacyDotNet
                     using (Py.GIL())
                     {
                         var pyStr = new PyString(keyStr);
-                        var dynPyObj = _vocab.__getitem__(pyStr);
+                        var dynPyObj = _pyVocab.__getitem__(pyStr);
                         lexeme = new Lexeme(dynPyObj);                        
                         _dictStr2Lex.Add(keyStr, lexeme);
                     }
@@ -71,7 +71,7 @@ namespace SpacyDotNet
                     Lexeme lexeme = null;
                     using (Py.GIL())
                     {
-                        var dynPyObj = _vocab.__getitem__(key);
+                        var dynPyObj = _pyVocab.__getitem__(key);
                         lexeme = new Lexeme(dynPyObj);                        
                         _dictLong2Lex.Add(keyHash, lexeme);
                     }
@@ -92,7 +92,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    var stringStore = _vocab.strings;
+                    var stringStore = _pyVocab.strings;
                     _stringStore = new StringStore(stringStore);
                     return _stringStore;
                 }
@@ -104,7 +104,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _vocab.to_disk(pyPath);
+                _pyVocab.to_disk(pyPath);
             }
         }
 
@@ -113,7 +113,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _vocab.from_disk(pyPath);
+                _pyVocab.from_disk(pyPath);
             }
         }
 

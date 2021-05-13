@@ -7,7 +7,7 @@ namespace SpacyDotNet
     [Serializable]
     public class Lexeme : ISerializable
     {
-        private dynamic _lexeme;
+        private dynamic _pyLexeme;
 
         private string _text;        
         private string _shape;
@@ -45,7 +45,7 @@ namespace SpacyDotNet
 
         internal Lexeme(dynamic lexeme)
         {
-            _lexeme = lexeme;
+            _pyLexeme = lexeme;
             _text = null;            
             _shape = null;
             _prefix = null;
@@ -62,7 +62,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_lexeme.text, ref _text);
+                return ToPythonHelpers.GetString(_pyLexeme.text, ref _text);
             }
         }
 
@@ -70,7 +70,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_lexeme.shape_, ref _shape);
+                return ToPythonHelpers.GetString(_pyLexeme.shape_, ref _shape);
             }
         }
 
@@ -78,7 +78,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_lexeme.prefix_, ref _prefix);
+                return ToPythonHelpers.GetString(_pyLexeme.prefix_, ref _prefix);
             }
         }
 
@@ -86,7 +86,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_lexeme.suffix_, ref _suffix);
+                return ToPythonHelpers.GetString(_pyLexeme.suffix_, ref _suffix);
             }
         }
 
@@ -95,7 +95,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetString(_lexeme.lang_, ref _lang);
+                return ToPythonHelpers.GetString(_pyLexeme.lang_, ref _lang);
             }
         }
 
@@ -103,7 +103,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBigInteger(_lexeme.orth, ref _orth);
+                return ToPythonHelpers.GetBigInteger(_pyLexeme.orth, ref _orth);
             }
         }
 
@@ -111,7 +111,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_lexeme.is_alpha, ref _isAlpha);
+                return ToPythonHelpers.GetBool(_pyLexeme.is_alpha, ref _isAlpha);
             }
         }
 
@@ -119,7 +119,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_lexeme.is_digit, ref _isDigit);
+                return ToPythonHelpers.GetBool(_pyLexeme.is_digit, ref _isDigit);
             }
         }
 
@@ -127,7 +127,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetBool(_lexeme.is_title, ref _isTitle);
+                return ToPythonHelpers.GetBool(_pyLexeme.is_title, ref _isTitle);
             }
         }
 

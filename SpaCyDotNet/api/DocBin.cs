@@ -5,14 +5,14 @@ namespace SpacyDotNet
 {
     public class DocBin
     {
-        private dynamic _docBin;
+        private dynamic _pyDocBin;
 
         public DocBin()
         {
             using (Py.GIL())
             {
                 dynamic spacy = Py.Import("spacy");
-                _docBin = spacy.tokens.DocBin.__call__();
+                _pyDocBin = spacy.tokens.DocBin.__call__();
             }
         }
 
@@ -32,7 +32,7 @@ namespace SpacyDotNet
 
                 var pyStoreUserDate = new PyInt(storeUserData ? 1 : 0);
                 dynamic spacy = Py.Import("spacy");
-                _docBin = spacy.tokens.DocBin.__call__(pyAttrs, pyStoreUserDate);
+                _pyDocBin = spacy.tokens.DocBin.__call__(pyAttrs, pyStoreUserDate);
             }
         }
 
@@ -41,7 +41,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 dynamic pyDoc = doc.PyObj;
-                _docBin.add(pyDoc);
+                _pyDocBin.add(pyDoc);
             }
         }
 
@@ -49,7 +49,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                return ToPythonHelpers.GetBytes(_docBin.to_bytes());
+                return ToPythonHelpers.GetBytes(_pyDocBin.to_bytes());
             }
         }
 
@@ -58,7 +58,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyObj = ToDotNetHelpers.GetBytes(bytes);                
-                _docBin.from_bytes(pyObj);
+                _pyDocBin.from_bytes(pyObj);
             }
         }
 
@@ -67,7 +67,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(pathFile);
-                _docBin.to_disk(pyPath);
+                _pyDocBin.to_disk(pyPath);
             }
         }
 
@@ -76,7 +76,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyPath = new PyString(pathFile);
-                _docBin.from_disk(pyPath);
+                _pyDocBin.from_disk(pyPath);
             }
         }
 
@@ -84,7 +84,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                dynamic pyDocs = _docBin.get_docs(vocab.PyObj);
+                dynamic pyDocs = _pyDocBin.get_docs(vocab.PyObj);
 
                 var docs = new List<Doc>();
                 while (true)

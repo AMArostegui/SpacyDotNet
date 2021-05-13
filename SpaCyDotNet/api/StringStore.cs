@@ -7,14 +7,14 @@ namespace SpacyDotNet
 {
     public class StringStore
     {
-        private dynamic _stringStore;
+        private dynamic _pyStringStore;
 
         private Dictionary<string, BigInteger> _dictStrToNumber;
         private Dictionary<BigInteger, string> _dictNumberToStr;
 
         internal StringStore(dynamic stringStore)
         {
-            _stringStore = stringStore;
+            _pyStringStore = stringStore;
             _dictStrToNumber = new Dictionary<string, BigInteger>();
             _dictNumberToStr = new Dictionary<BigInteger, string>();            
         }
@@ -32,7 +32,7 @@ namespace SpacyDotNet
                     BigInteger valHash;
                     using (Py.GIL())
                     {
-                        var dynPyNumber = _stringStore.__getitem__(key);
+                        var dynPyNumber = _pyStringStore.__getitem__(key);
                         var pyNumber = new PyLong(dynPyNumber);
                         valHash = BigInteger.Parse(pyNumber.ToString());
                         _dictStrToNumber.Add(keyStr, valHash);
@@ -51,7 +51,7 @@ namespace SpacyDotNet
                     var valStr = string.Empty;
                     using (Py.GIL())
                     {
-                        var dynPyStr = _stringStore.__getitem__(key);
+                        var dynPyStr = _pyStringStore.__getitem__(key);
                         var pyString = new PyString(dynPyStr);
                         valStr = pyString.ToString();
                         _dictNumberToStr.Add(keyHash, valStr);

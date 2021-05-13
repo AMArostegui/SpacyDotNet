@@ -8,13 +8,13 @@ namespace SpacyDotNet
     [Serializable]
     public class Lang : ISerializable
     {
-        private dynamic _lang;
+        private dynamic _pyLang;
 
         private List<string> _pipeNames;
 
         internal Lang(dynamic lang)
         {
-            _lang = lang;
+            _pyLang = lang;
             _pipeNames = null;
         }
 
@@ -29,7 +29,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyString = new PyString(text);
-                dynamic doc = _lang.__call__(pyString);
+                dynamic doc = _pyLang.__call__(pyString);
                 return new Doc(doc);
             }
         }
@@ -38,7 +38,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return ToPythonHelpers.GetListBuiltInType<string>(_lang.pipe_names, ref _pipeNames);
+                return ToPythonHelpers.GetListBuiltInType<string>(_pyLang.pipe_names, ref _pipeNames);
             }
         }
 
@@ -46,7 +46,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return new Vocab(_lang.vocab);
+                return new Vocab(_pyLang.vocab);
             }
         }
 
