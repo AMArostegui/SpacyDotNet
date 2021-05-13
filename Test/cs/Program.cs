@@ -21,9 +21,8 @@ namespace Test
             //SpaCy101.Run();
             //LinguisticFeatures.Run();
             //ExampleES.Run();
-            //Serialization.Run();
+            Serialization.Run();
             //DisplaCy.Run();
-            Misc.Run();
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

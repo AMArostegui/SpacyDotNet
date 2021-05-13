@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Python.Runtime;
+using System;
 using System.Runtime.Serialization;
 
 namespace SpacyDotNet
@@ -20,6 +21,15 @@ namespace SpacyDotNet
 
         protected Span(SerializationInfo info, StreamingContext context)
         {
+            var dummyBytes = new byte[1];
+
+            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+            using (Py.GIL())
+            {
+                var pyBytes = ToPython.GetBytes(bytes);
+                _pySpan.from_bytes(pyBytes);
+            }
+
             _text = info.GetString("Text");
             _label = info.GetString("Label");
 
@@ -69,6 +79,12 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            using (Py.GIL())
+            {
+                var pyObj = Helpers.GetBytes(_pySpan.to_bytes());
+                info.AddValue("PyObj", pyObj);
+            }
+
             // Using the property is important form the members to be loaded
             info.AddValue("Text", Text);
             info.AddValue("Label", Label);

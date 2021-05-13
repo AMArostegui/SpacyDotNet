@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Python.Runtime;
 
 namespace SpacyDotNet
@@ -29,6 +31,14 @@ namespace SpacyDotNet
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
+            var dummyBytes = new byte[1];
+
+            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+            using (Py.GIL())
+            {
+                var pyBytes = ToPython.GetBytes(bytes);
+                _pyVocab.from_bytes(pyBytes);
+            }
         }
 
         internal Vocab(dynamic vocab)
@@ -101,24 +111,32 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            using (Py.GIL())
-            {
-                var pyPath = new PyString(path);
-                _pyVocab.to_disk(pyPath);
-            }
+            var formatter = new BinaryFormatter();
+            using var stream = new FileStream(path, FileMode.Create);
+            formatter.Serialize(stream, this);
         }
 
         public void FromDisk(string path)
         {
-            using (Py.GIL())
-            {
-                var pyPath = new PyString(path);
-                _pyVocab.from_disk(pyPath);
-            }
+            var formatter = new BinaryFormatter();
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            var vocab = (Vocab)formatter.Deserialize(stream);
+
+            Copy(vocab);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            using (Py.GIL())
+            {
+                var pyObj = Helpers.GetBytes(_pyVocab.to_bytes());
+                info.AddValue("PyObj", pyObj);
+            }
+        }
+
+        private void Copy(Vocab vocab)
+        {
+            _pyVocab = vocab._pyVocab;
         }
     }
 }

@@ -20,6 +20,15 @@ namespace SpacyDotNet
 
         protected Lang(SerializationInfo info, StreamingContext context)
         {
+            var dummyBytes = new byte[1];
+
+            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+            using (Py.GIL())
+            {
+                var pyBytes = ToPython.GetBytes(bytes);
+                _pyLang.from_bytes(pyBytes);
+            }
+
             var temp = new List<string>();
             _pipeNames = (List<string>)info.GetValue("Sentences", temp.GetType());
         }
@@ -52,6 +61,12 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            using (Py.GIL())
+            {
+                var pyObj = Helpers.GetBytes(_pyLang.to_bytes());
+                info.AddValue("PyObj", pyObj);
+            }
+
             // Using the property is important form the members to be loaded
             info.AddValue("PipeNames", PipeNames);
         }
