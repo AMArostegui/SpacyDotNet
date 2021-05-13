@@ -49,7 +49,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                return ToPythonHelpers.GetBytes(_pyDocBin.to_bytes());
+                return Helpers.GetBytes(_pyDocBin.to_bytes());
             }
         }
 
@@ -57,7 +57,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var pyObj = ToDotNetHelpers.GetBytes(bytes);                
+                var pyObj = ToPython.GetBytes(bytes);                
                 _pyDocBin.from_bytes(pyObj);
             }
         }

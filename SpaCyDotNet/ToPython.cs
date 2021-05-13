@@ -5,7 +5,7 @@ using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class ToDotNetHelpers
+    public class ToPython
     {
         public static dynamic GetBytes(byte[] bytes)
         {
