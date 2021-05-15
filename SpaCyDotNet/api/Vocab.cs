@@ -53,7 +53,7 @@ namespace SpacyDotNet
         internal dynamic PyObj
             { get => _pyVocab; }
 
-        public Serialization Serialization { get; set; } = Serialization.Spacy;
+        public static Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public Lexeme this[object key]
         {

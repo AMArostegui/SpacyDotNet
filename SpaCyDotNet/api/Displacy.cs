@@ -17,7 +17,7 @@ namespace SpacyDotNet
             {
                 dynamic spacy = Py.Import("spacy");
 
-                var pyDoc = doc.PyObj;                
+                var pyDoc = doc.PyDoc;                
                 var pyStyle = new PyString(style);
                 spacy.displacy.serve(pyDoc, pyStyle);
             }

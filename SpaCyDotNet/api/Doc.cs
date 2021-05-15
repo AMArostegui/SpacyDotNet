@@ -11,8 +11,6 @@ namespace SpacyDotNet
     [Serializable]
     public class Doc : ISerializable
     {
-        private dynamic _pyDoc;
-
         private Vocab _vocab;
 
         private List<Token> _tokens;
@@ -43,10 +41,10 @@ namespace SpacyDotNet
                 {
                     dynamic spacy = Py.Import("spacy");
                     dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                    _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                    PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
 
                     var pyBytes = ToPython.GetBytes(bytes);
-                    _pyDoc.from_bytes(pyBytes);
+                    PyDoc.from_bytes(pyBytes);
                 }
             }
 
@@ -70,26 +68,25 @@ namespace SpacyDotNet
             {
                 dynamic spacy = Py.Import("spacy");
                 dynamic pyVocab = vocab.PyObj;
-                _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
             }
         }
 
         internal Doc(dynamic doc)
         {
-            _pyDoc = doc;
+            PyDoc = doc;
             _vocab = null;
         }
 
-        internal dynamic PyObj
-            { get => _pyDoc; }
+        internal dynamic PyDoc { get; set; }            
 
-        public Serialization Serialization { get; set; } = Serialization.Spacy;
+        public static Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public List<Token> Tokens
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc, ref _tokens);
+                return Helpers.GetListWrapperObj(PyDoc, ref _tokens);
             }
         }
 
@@ -97,7 +94,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.sents, ref _sentences);
+                return Helpers.GetListWrapperObj(PyDoc?.sents, ref _sentences);
             }
         }
 
@@ -105,7 +102,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.noun_chunks, ref _nounChunks);
+                return Helpers.GetListWrapperObj(PyDoc?.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -113,7 +110,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.ents, ref _ents);
+                return Helpers.GetListWrapperObj(PyDoc?.ents, ref _ents);
             }
         }
 
@@ -126,7 +123,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    var vocab = _pyDoc.vocab;
+                    var vocab = PyDoc.vocab;
                     _vocab = new Vocab(vocab);
                     return _vocab;
                 }
@@ -140,7 +137,7 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     var pyPath = new PyString(path);
-                    _pyDoc.to_disk(pyPath);
+                    PyDoc.to_disk(pyPath);
                 }
             }
             else
@@ -158,7 +155,7 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     var pyPath = new PyString(path);
-                    _pyDoc.from_disk(pyPath);
+                    PyDoc.from_disk(pyPath);
                 }
             }
             else
@@ -176,7 +173,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    return Helpers.GetBytes(_pyDoc.to_bytes());
+                    return Helpers.GetBytes(PyDoc.to_bytes());
                 }
             }
             else
@@ -195,7 +192,7 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     var pyBytes = ToPython.GetBytes(bytes);
-                    _pyDoc.from_bytes(pyBytes);
+                    PyDoc.from_bytes(pyBytes);
                 }
             }
             else
@@ -219,7 +216,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Helpers.GetBytes(_pyDoc.to_bytes());
+                    var pyObj = Helpers.GetBytes(PyDoc.to_bytes());
                     info.AddValue("PyObj", pyObj);
                 }
             }
@@ -234,7 +231,7 @@ namespace SpacyDotNet
 
         private void Copy(Doc doc)
         {
-            _pyDoc = doc._pyDoc;
+            PyDoc = doc.PyDoc;
             _vocab = doc._vocab;
             _tokens = doc._tokens;
             _sentences = doc._sentences;
