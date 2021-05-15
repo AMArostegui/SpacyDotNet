@@ -194,7 +194,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyBytes = Helpers.GetBytes(bytes);
+                    var pyBytes = ToPython.GetBytes(bytes);
                     _pyDoc.from_bytes(pyBytes);
                 }
             }
