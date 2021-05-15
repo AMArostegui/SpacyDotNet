@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -27,17 +28,26 @@ namespace SpacyDotNet
 
         protected Doc(SerializationInfo info, StreamingContext context)
         {
-            var dummyBytes = new byte[1];
-
-            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-            using (Py.GIL())
+            if (Serialization == Serialization.Spacy)
             {
-                dynamic spacy = Py.Import("spacy");                
-                dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                Debug.Assert(false);
+                return;
+            }
 
-                var pyBytes = ToPython.GetBytes(bytes);
-                _pyDoc.from_bytes(pyBytes);
+            if (Serialization == Serialization.SpacyAndDotNet)
+            {
+                var dummyBytes = new byte[1];
+
+                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                    _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    _pyDoc.from_bytes(pyBytes);
+                }
             }
 
             var tempVocab = new Vocab();
@@ -71,7 +81,9 @@ namespace SpacyDotNet
         }
 
         internal dynamic PyObj
-            { get => _pyDoc; } 
+            { get => _pyDoc; }
+
+        public Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public List<Token> Tokens
         {
@@ -123,44 +135,93 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Create);
-            formatter.Serialize(stream, this);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyPath = new PyString(path);
+                    _pyDoc.to_disk(pyPath);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                using var stream = new FileStream(path, FileMode.Create);
+                formatter.Serialize(stream, this);
+            }
         }
 
         public void FromDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var doc = (Doc)formatter.Deserialize(stream);
-
-            Copy(doc);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyPath = new PyString(path);
+                    _pyDoc.from_disk(pyPath);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                var doc = (Doc)formatter.Deserialize(stream);
+                Copy(doc);
+            }
         }
 
         public byte[] ToBytes()
         {
-            var formatter = new BinaryFormatter();
-            var stream = new MemoryStream();
-            formatter.Serialize(stream, this);
-
-            return stream.ToArray();
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    return Helpers.GetBytes(_pyDoc.to_bytes());
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                var stream = new MemoryStream();
+                formatter.Serialize(stream, this);
+                return stream.ToArray();
+            }
         }
 
         public void FromBytes(byte[] bytes)
         {
-            var formatter = new BinaryFormatter();
-            var stream = new MemoryStream(bytes);
-            var doc = (Doc)formatter.Deserialize(stream);
-
-            Copy(doc);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyBytes = Helpers.GetBytes(bytes);
+                    _pyDoc.from_bytes(pyBytes);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                var stream = new MemoryStream(bytes);
+                var doc = (Doc)formatter.Deserialize(stream);
+                Copy(doc);
+            }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            using (Py.GIL())
+            if (Serialization == Serialization.Spacy)
             {
-                var pyObj = Helpers.GetBytes(_pyDoc.to_bytes());
-                info.AddValue("PyObj", pyObj);
+                Debug.Assert(false);
+                return;
+            }
+
+            if (Serialization == Serialization.SpacyAndDotNet)
+            {
+                using (Py.GIL())
+                {
+                    var pyObj = Helpers.GetBytes(_pyDoc.to_bytes());
+                    info.AddValue("PyObj", pyObj);
+                }
             }
 
             // Using the property is important form the members to be loaded
