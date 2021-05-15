@@ -33,6 +33,9 @@ namespace SpacyDotNet
             var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
             using (Py.GIL())
             {
+                dynamic spacy = Py.Import("spacy");
+                _pyVocab = spacy.vocab.Vocab.__call__();
+
                 var pyBytes = ToPython.GetBytes(bytes);
                 _pyVocab.from_bytes(pyBytes);
             }

@@ -40,6 +40,9 @@ namespace SpacyDotNet
                 _pyDoc.from_bytes(pyBytes);
             }
 
+            var tempVocab = new Vocab();
+            _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
+
             var tempTokens = new List<Token>();
             _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
 
@@ -161,6 +164,7 @@ namespace SpacyDotNet
             }
 
             // Using the property is important form the members to be loaded
+            info.AddValue("Vocab", Vocab);
             info.AddValue("Tokens", Tokens);
             info.AddValue("Sentences", Sents);
             info.AddValue("NounChunks", NounChunks);
