@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Runtime.Serialization;
@@ -28,16 +29,19 @@ namespace SpacyDotNet
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
-            var dummyBytes = new byte[1];
-
-            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-            using (Py.GIL())
+            if (Serialization == Serialization.SpacyAndDotNet)
             {
-                dynamic spacy = Py.Import("spacy");
-                _pyVocab = spacy.vocab.Vocab.__call__();
+                var dummyBytes = new byte[1];
 
-                var pyBytes = ToPython.GetBytes(bytes);
-                _pyVocab.from_bytes(pyBytes);
+                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    _pyVocab = spacy.vocab.Vocab.__call__();
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    _pyVocab.from_bytes(pyBytes);
+                }
             }
         }
 
@@ -47,7 +51,9 @@ namespace SpacyDotNet
         }
 
         internal dynamic PyObj
-            { get => _pyVocab; } 
+            { get => _pyVocab; }
+
+        public Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public Lexeme this[object key]
         {
@@ -111,32 +117,44 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Create);
-            formatter.Serialize(stream, this);
+            if (Serialization != Serialization.Spacy)
+                throw new NotImplementedException();
+
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _pyVocab.to_disk(pyPath);
+            }
         }
 
         public void FromDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var vocab = (Vocab)formatter.Deserialize(stream);
+            if (Serialization != Serialization.Spacy)
+                throw new NotImplementedException();
 
-            Copy(vocab);
+            using (Py.GIL())
+            {
+                var pyPath = new PyString(path);
+                _pyVocab.from_disk(pyPath);
+            }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            using (Py.GIL())
+            if (Serialization == Serialization.Spacy)
             {
-                var pyObj = Helpers.GetBytes(_pyVocab.to_bytes());
-                info.AddValue("PyObj", pyObj);
+                Debug.Assert(false);
+                return;
             }
-        }
 
-        private void Copy(Vocab vocab)
-        {
-            _pyVocab = vocab._pyVocab;
+            if (Serialization == Serialization.SpacyAndDotNet)
+            {
+                using (Py.GIL())
+                {
+                    var pyObj = Helpers.GetBytes(_pyVocab.to_bytes());
+                    info.AddValue("PyObj", pyObj);
+                }
+            }
         }
     }
 }
