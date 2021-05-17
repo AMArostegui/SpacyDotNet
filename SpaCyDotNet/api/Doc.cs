@@ -83,7 +83,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(PyDoc, ref _tokens);
+                return Interop.GetListWrapperObj(PyDoc, ref _tokens);
             }
         }
 
@@ -91,7 +91,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(PyDoc?.sents, ref _sentences);
+                return Interop.GetListWrapperObj(PyDoc?.sents, ref _sentences);
             }
         }
 
@@ -99,7 +99,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(PyDoc?.noun_chunks, ref _nounChunks);
+                return Interop.GetListWrapperObj(PyDoc?.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -107,7 +107,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(PyDoc?.ents, ref _ents);
+                return Interop.GetListWrapperObj(PyDoc?.ents, ref _ents);
             }
         }
 
@@ -170,7 +170,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    return Helpers.GetBytes(PyDoc.to_bytes());
+                    return Interop.GetBytes(PyDoc.to_bytes());
                 }
             }
             else
@@ -207,7 +207,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Helpers.GetBytes(PyDoc.to_bytes());
+                    var pyObj = Interop.GetBytes(PyDoc.to_bytes());
                     info.AddValue("PyObj", pyObj);
                 }
             }

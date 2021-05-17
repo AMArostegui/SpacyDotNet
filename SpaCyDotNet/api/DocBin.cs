@@ -88,7 +88,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    return Helpers.GetBytes(_pyDocBin.to_bytes());
+                    return Interop.GetBytes(_pyDocBin.to_bytes());
                 }
             }
             else
@@ -158,7 +158,7 @@ namespace SpacyDotNet
 
         public List<Doc> GetDocs(Vocab vocab)
         {
-            return Helpers.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyObj), ref _docs);
+            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyObj), ref _docs);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -167,7 +167,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Helpers.GetBytes(_pyDocBin.to_bytes());
+                    var pyObj = Interop.GetBytes(_pyDocBin.to_bytes());
                     info.AddValue("PyObj", pyObj);
                 }
             }

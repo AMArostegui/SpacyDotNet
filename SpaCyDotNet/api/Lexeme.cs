@@ -72,7 +72,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyLexeme?.text, ref _text);
+                return Interop.GetString(_pyLexeme?.text, ref _text);
             }
         }
 
@@ -80,7 +80,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyLexeme?.shape_, ref _shape);
+                return Interop.GetString(_pyLexeme?.shape_, ref _shape);
             }
         }
 
@@ -88,7 +88,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyLexeme?.prefix_, ref _prefix);
+                return Interop.GetString(_pyLexeme?.prefix_, ref _prefix);
             }
         }
 
@@ -96,7 +96,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyLexeme?.suffix_, ref _suffix);
+                return Interop.GetString(_pyLexeme?.suffix_, ref _suffix);
             }
         }
 
@@ -104,7 +104,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyLexeme?.lang_, ref _lang);
+                return Interop.GetString(_pyLexeme?.lang_, ref _lang);
             }
         }
 
@@ -112,7 +112,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBigInteger(_pyLexeme?.orth, ref _orth);
+                return Interop.GetBigInteger(_pyLexeme?.orth, ref _orth);
             }
         }
 
@@ -120,7 +120,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyLexeme?.is_alpha, ref _isAlpha);
+                return Interop.GetBool(_pyLexeme?.is_alpha, ref _isAlpha);
             }
         }
 
@@ -128,7 +128,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyLexeme?.is_digit, ref _isDigit);
+                return Interop.GetBool(_pyLexeme?.is_digit, ref _isDigit);
             }
         }
 
@@ -136,7 +136,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyLexeme?.is_title, ref _isTitle);
+                return Interop.GetBool(_pyLexeme?.is_title, ref _isTitle);
             }
         }
 
@@ -144,7 +144,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var pyObj = Helpers.GetBytes(_pyLexeme.to_bytes());
+                var pyObj = Interop.GetBytes(_pyLexeme.to_bytes());
                 info.AddValue("PyObj", pyObj);
             }
 

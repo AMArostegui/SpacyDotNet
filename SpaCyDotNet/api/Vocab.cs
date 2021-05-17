@@ -145,7 +145,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Helpers.GetBytes(_pyVocab.to_bytes());
+                    var pyObj = Interop.GetBytes(_pyVocab.to_bytes());
                     info.AddValue("PyObj", pyObj);
                 }
             }

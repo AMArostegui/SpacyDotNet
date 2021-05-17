@@ -47,7 +47,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListBuiltInType<string>(_pyLang?.pipe_names, ref _pipeNames);
+                return Interop.GetListBuiltInType<string>(_pyLang?.pipe_names, ref _pipeNames);
             }
         }
 
@@ -63,7 +63,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var pyObj = Helpers.GetBytes(_pyLang.to_bytes());
+                var pyObj = Interop.GetBytes(_pyLang.to_bytes());
                 info.AddValue("PyObj", pyObj);
             }
 

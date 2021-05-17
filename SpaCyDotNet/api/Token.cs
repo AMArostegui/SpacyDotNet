@@ -84,7 +84,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.text, ref _text);
+                return Interop.GetString(_pyToken?.text, ref _text);
             }
         }
 
@@ -92,7 +92,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.lemma_, ref _lemma);
+                return Interop.GetString(_pyToken?.lemma_, ref _lemma);
             }
         }
 
@@ -100,7 +100,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.pos_, ref _pos);
+                return Interop.GetString(_pyToken?.pos_, ref _pos);
             }
         }
 
@@ -108,7 +108,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.tag_, ref _tag);
+                return Interop.GetString(_pyToken?.tag_, ref _tag);
             }
         }
 
@@ -116,7 +116,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.dep_, ref _dep);
+                return Interop.GetString(_pyToken?.dep_, ref _dep);
             }
         }
 
@@ -124,7 +124,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pyToken?.shape_, ref _shape);
+                return Interop.GetString(_pyToken?.shape_, ref _shape);
             }
         }
 
@@ -132,7 +132,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.is_alpha, ref _isAlpha);
+                return Interop.GetBool(_pyToken?.is_alpha, ref _isAlpha);
             }
         }
 
@@ -140,7 +140,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.is_stop, ref _isStop);
+                return Interop.GetBool(_pyToken?.is_stop, ref _isStop);
             }
         }
 
@@ -148,7 +148,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.is_punct, ref _isPunct);
+                return Interop.GetBool(_pyToken?.is_punct, ref _isPunct);
             }
         }
 
@@ -156,7 +156,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.is_digit, ref _isDigit);
+                return Interop.GetBool(_pyToken?.is_digit, ref _isDigit);
             }
         }
 
@@ -164,7 +164,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.like_num, ref _likeNum);
+                return Interop.GetBool(_pyToken?.like_num, ref _likeNum);
             }
         }
 
@@ -172,7 +172,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.like_email, ref _likeEMail);
+                return Interop.GetBool(_pyToken?.like_email, ref _likeEMail);
             }
         }
 
@@ -180,7 +180,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.has_vector, ref _hasVector);
+                return Interop.GetBool(_pyToken?.has_vector, ref _hasVector);
             }
         }
 
@@ -188,7 +188,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetDouble(_pyToken?.vector_norm, ref _vectorNorm);
+                return Interop.GetDouble(_pyToken?.vector_norm, ref _vectorNorm);
             }
         }
 
@@ -196,7 +196,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetBool(_pyToken?.is_oov, ref _isOov);
+                return Interop.GetBool(_pyToken?.is_oov, ref _isOov);
             }
         }
 
@@ -219,7 +219,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyToken?.children, ref _children);
+                return Interop.GetListWrapperObj(_pyToken?.children, ref _children);
             }
         }
 
