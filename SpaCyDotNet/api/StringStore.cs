@@ -41,26 +41,20 @@ namespace SpacyDotNet
                     return valHash;
                 }
 
-                var keyHashN = key as BigInteger?;
-                if (keyHashN != null)
+                var keyHash = key.AsBigInteger();
+                if (_dictNumberToStr.ContainsKey(keyHash))
+                    return _dictNumberToStr[keyHash];
+
+                var valStr = string.Empty;
+                using (Py.GIL())
                 {
-                    var keyHash = (BigInteger)keyHashN;
-                    if (_dictNumberToStr.ContainsKey(keyHash))
-                        return _dictNumberToStr[keyHash];
-
-                    var valStr = string.Empty;
-                    using (Py.GIL())
-                    {
-                        var dynPyStr = _pyStringStore.__getitem__(key);
-                        var pyString = new PyString(dynPyStr);
-                        valStr = pyString.ToString();
-                        _dictNumberToStr.Add(keyHash, valStr);
-                    }
-
-                    return valStr;
+                    var dynPyStr = _pyStringStore.__getitem__(key);
+                    var pyString = new PyString(dynPyStr);
+                    valStr = pyString.ToString();
+                    _dictNumberToStr.Add(keyHash, valStr);
                 }
 
-                throw new Exception("Wrong datatype in parameter passed to StringStore");
+                return valStr;
             }
         }
     }
