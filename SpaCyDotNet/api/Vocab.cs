@@ -29,7 +29,7 @@ namespace SpacyDotNet
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 var dummyBytes = new byte[1];
 
@@ -141,13 +141,7 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.Spacy)
-            {
-                Debug.Assert(false);
-                return;
-            }
-
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 using (Py.GIL())
                 {

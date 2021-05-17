@@ -26,13 +26,7 @@ namespace SpacyDotNet
 
         protected Doc(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.Spacy)
-            {
-                Debug.Assert(false);
-                return;
-            }
-
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 var dummyBytes = new byte[1];
 
@@ -48,16 +42,19 @@ namespace SpacyDotNet
                 }
             }
 
-            var tempVocab = new Vocab();
-            _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
+            if (Serialization.IsDotNet())
+            {
+                var tempVocab = new Vocab();
+                _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
 
-            var tempTokens = new List<Token>();
-            _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
+                var tempTokens = new List<Token>();
+                _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
 
-            var tempSpan = new List<Span>();
-            _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
-            _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
-            _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+                var tempSpan = new List<Span>();
+                _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
+                _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
+                _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+            }
         }
 
         public Doc(Vocab vocab)
@@ -206,13 +203,7 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.Spacy)
-            {
-                Debug.Assert(false);
-                return;
-            }
-
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 using (Py.GIL())
                 {
@@ -221,12 +212,15 @@ namespace SpacyDotNet
                 }
             }
 
-            // Using the property is important form the members to be loaded
-            info.AddValue("Vocab", Vocab);
-            info.AddValue("Tokens", Tokens);
-            info.AddValue("Sentences", Sents);
-            info.AddValue("NounChunks", NounChunks);
-            info.AddValue("Ents", Ents);
+            if (Serialization.IsDotNet())
+            {
+                // Using the property is important form the members to be loaded
+                info.AddValue("Vocab", Vocab);
+                info.AddValue("Tokens", Tokens);
+                info.AddValue("Sentences", Sents);
+                info.AddValue("NounChunks", NounChunks);
+                info.AddValue("Ents", Ents);
+            }
         }
 
         private void Copy(Doc doc)

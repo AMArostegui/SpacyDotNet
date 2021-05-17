@@ -45,16 +45,7 @@ namespace SpacyDotNet
 
         protected DocBin(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.Spacy)
-            {
-                Debug.Assert(false);
-                return;
-            }
-
-            var tempDocs = new List<Doc>();
-            _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
-
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 var dummyBytes = new byte[1];
 
@@ -66,25 +57,13 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     _pyDocBin.from_bytes(pyBytes);
-
-                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                    dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
-
-                    var i = 0;
-                    while (true)
-                    {
-                        try
-                        {
-                            dynamic pyDoc = pyDocs.__next__();
-                            _docs[i].PyDoc = pyDoc;
-                            i++;
-                        }
-                        catch (PythonException)
-                        {
-                            break;
-                        }
-                    }
                 }
+            }
+
+            if (Serialization.IsDotNet())
+            {
+                var tempDocs = new List<Doc>();
+                _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
             }
         }
 
@@ -184,13 +163,7 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization == Serialization.Spacy)
-            {
-                Debug.Assert(false);
-                return;
-            }
-
-            if (Serialization == Serialization.SpacyAndDotNet)
+            if (Serialization.IsSpacy())
             {
                 using (Py.GIL())
                 {
@@ -199,16 +172,44 @@ namespace SpacyDotNet
                 }
             }
 
-            Doc.Serialization = Serialization.DotNet;
-            Vocab.Serialization = Serialization.DotNet;
+            if (Serialization.IsDotNet())
+            {
+                Doc.Serialization = Serialization.DotNet;
+                Vocab.Serialization = Serialization.Spacy;
 
-            info.AddValue("Docs", _docs);
+                info.AddValue("Docs", _docs);
+            }
         }
 
         private void Copy(DocBin docBin)
         {
             _pyDocBin = docBin._pyDocBin;
             _docs = docBin._docs;
+
+            if (!Serialization.IsSpacy())
+                return;
+
+            using (Py.GIL())
+            {
+                dynamic spacy = Py.Import("spacy");
+                dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
+
+                var i = 0;
+                while (true)
+                {
+                    try
+                    {
+                        dynamic pyDoc = pyDocs.__next__();
+                        _docs[i].PyDoc = pyDoc;
+                        i++;
+                    }
+                    catch (PythonException)
+                    {
+                        break;
+                    }
+                }
+            }
         }
     }
 }
