@@ -10,17 +10,13 @@ Most of the basic features in _Spacy101 section_ of the docs are available. All 
 
 Furthermore, any developer should be ready to add the missing properties or classes in a very straightforward manner.
 
-### Serialization
-
-The files we generate when saving spaCy objects to file, are incompatible with spaCyDotNet. The reverse is also true. This is by design as, for performance reasons, I've decided to serialize .NET object properties alongside spaCy objects.
-
 ## Requirements
 
 This projects relies on [Python.NET](http://pythonnet.github.io/) to interop with spaCy, which is written in Python/Cython.
 
 It's been tested under **Windows 10** and **Ubuntu Linux 20.04**, using the following environment
 
-- .NET Core 3.1 / .NET Standard 2.0
+- .NET Core 3.1 / .NET Standard 2.1
 - spaCy 3.0.5
 - Python 3.8
 - Python.NET: Latest official NuGet: [3.0.0-preview2021-04-03](https://www.nuget.org/packages/pythonnet/3.0.0-preview2021-04-03)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -10,8 +11,6 @@ namespace SpacyDotNet
     [Serializable]
     public class Doc : ISerializable
     {
-        private dynamic _pyDoc;
-
         private Vocab _vocab;
 
         private List<Token> _tokens;
@@ -27,29 +26,35 @@ namespace SpacyDotNet
 
         protected Doc(SerializationInfo info, StreamingContext context)
         {
-            var dummyBytes = new byte[1];
-
-            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-            using (Py.GIL())
+            if (Serialization.IsSpacy())
             {
-                dynamic spacy = Py.Import("spacy");                
-                dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                var dummyBytes = new byte[1];
 
-                var pyBytes = ToPython.GetBytes(bytes);
-                _pyDoc.from_bytes(pyBytes);
+                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                    PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    PyDoc.from_bytes(pyBytes);
+                }
             }
 
-            var tempVocab = new Vocab();
-            _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
+            if (Serialization.IsDotNet())
+            {
+                var tempVocab = new Vocab();
+                _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
 
-            var tempTokens = new List<Token>();
-            _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
+                var tempTokens = new List<Token>();
+                _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
 
-            var tempSpan = new List<Span>();
-            _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
-            _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
-            _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+                var tempSpan = new List<Span>();
+                _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
+                _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
+                _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+            }
         }
 
         public Doc(Vocab vocab)
@@ -60,24 +65,25 @@ namespace SpacyDotNet
             {
                 dynamic spacy = Py.Import("spacy");
                 dynamic pyVocab = vocab.PyObj;
-                _pyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+                PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
             }
         }
 
         internal Doc(dynamic doc)
         {
-            _pyDoc = doc;
+            PyDoc = doc;
             _vocab = null;
         }
 
-        internal dynamic PyObj
-            { get => _pyDoc; } 
+        internal dynamic PyDoc { get; set; }            
+
+        public static Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public List<Token> Tokens
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc, ref _tokens);
+                return Interop.GetListWrapperObj(PyDoc, ref _tokens);
             }
         }
 
@@ -85,7 +91,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.sents, ref _sentences);
+                return Interop.GetListWrapperObj(PyDoc?.sents, ref _sentences);
             }
         }
 
@@ -93,7 +99,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.noun_chunks, ref _nounChunks);
+                return Interop.GetListWrapperObj(PyDoc?.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -101,7 +107,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetListWrapperObj(_pyDoc?.ents, ref _ents);
+                return Interop.GetListWrapperObj(PyDoc?.ents, ref _ents);
             }
         }
 
@@ -114,7 +120,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    var vocab = _pyDoc.vocab;
+                    var vocab = PyDoc.vocab;
                     _vocab = new Vocab(vocab);
                     return _vocab;
                 }
@@ -123,57 +129,103 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Create);
-            formatter.Serialize(stream, this);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyPath = new PyString(path);
+                    PyDoc.to_disk(pyPath);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                using var stream = new FileStream(path, FileMode.Create);
+                formatter.Serialize(stream, this);
+            }
         }
 
         public void FromDisk(string path)
         {
-            var formatter = new BinaryFormatter();
-            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var doc = (Doc)formatter.Deserialize(stream);
-
-            Copy(doc);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyPath = new PyString(path);
+                    PyDoc.from_disk(pyPath);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                var doc = (Doc)formatter.Deserialize(stream);
+                Copy(doc);
+            }
         }
 
         public byte[] ToBytes()
         {
-            var formatter = new BinaryFormatter();
-            var stream = new MemoryStream();
-            formatter.Serialize(stream, this);
-
-            return stream.ToArray();
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    return Interop.GetBytes(PyDoc.to_bytes());
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                var stream = new MemoryStream();
+                formatter.Serialize(stream, this);
+                return stream.ToArray();
+            }
         }
 
         public void FromBytes(byte[] bytes)
         {
-            var formatter = new BinaryFormatter();
-            var stream = new MemoryStream(bytes);
-            var doc = (Doc)formatter.Deserialize(stream);
-
-            Copy(doc);
+            if (Serialization == Serialization.Spacy)
+            {
+                using (Py.GIL())
+                {
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    PyDoc.from_bytes(pyBytes);
+                }
+            }
+            else
+            {
+                var formatter = new BinaryFormatter();
+                var stream = new MemoryStream(bytes);
+                var doc = (Doc)formatter.Deserialize(stream);
+                Copy(doc);
+            }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            using (Py.GIL())
+            if (Serialization.IsSpacy())
             {
-                var pyObj = Helpers.GetBytes(_pyDoc.to_bytes());
-                info.AddValue("PyObj", pyObj);
+                using (Py.GIL())
+                {
+                    var pyObj = Interop.GetBytes(PyDoc.to_bytes());
+                    info.AddValue("PyObj", pyObj);
+                }
             }
 
-            // Using the property is important form the members to be loaded
-            info.AddValue("Vocab", Vocab);
-            info.AddValue("Tokens", Tokens);
-            info.AddValue("Sentences", Sents);
-            info.AddValue("NounChunks", NounChunks);
-            info.AddValue("Ents", Ents);
+            if (Serialization.IsDotNet())
+            {
+                // Using the property is important form the members to be loaded
+                info.AddValue("Vocab", Vocab);
+                info.AddValue("Tokens", Tokens);
+                info.AddValue("Sentences", Sents);
+                info.AddValue("NounChunks", NounChunks);
+                info.AddValue("Ents", Ents);
+            }
         }
 
         private void Copy(Doc doc)
         {
-            _pyDoc = doc._pyDoc;
+            PyDoc = doc.PyDoc;
             _vocab = doc._vocab;
             _tokens = doc._tokens;
             _sentences = doc._sentences;

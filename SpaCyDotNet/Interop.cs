@@ -9,7 +9,7 @@ using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public class Helpers
+    public class Interop
     {
         public static bool GetBool(dynamic dynBoolPyObj, ref bool? boolMember)
         {

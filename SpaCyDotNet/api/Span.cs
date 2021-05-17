@@ -40,7 +40,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pySpan?.text, ref _text);
+                return Interop.GetString(_pySpan?.text, ref _text);
             }
         }
 
@@ -48,7 +48,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetString(_pySpan?.label_, ref _label);
+                return Interop.GetString(_pySpan?.label_, ref _label);
             }
         }
 
@@ -56,7 +56,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetInt(_pySpan?.start_char, ref _startChar);
+                return Interop.GetInt(_pySpan?.start_char, ref _startChar);
             }
         }
 
@@ -64,7 +64,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Helpers.GetInt(_pySpan?.end_char, ref _endChar);
+                return Interop.GetInt(_pySpan?.end_char, ref _endChar);
             }
         }
 
