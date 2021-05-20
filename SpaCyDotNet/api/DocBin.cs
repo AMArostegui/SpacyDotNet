@@ -13,8 +13,6 @@ namespace SpacyDotNet
         private dynamic _pyDocBin;
         private List<Doc> _docs;
 
-        private Serialization _serialization = Serialization.Spacy;
-
         public DocBin()
         {
             using (Py.GIL())
@@ -46,7 +44,7 @@ namespace SpacyDotNet
 
         protected DocBin(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            try
             {
                 var dummyBytes = new byte[1];
 
@@ -58,27 +56,29 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     _pyDocBin.from_bytes(pyBytes);
+
+                    Serialization |= Serialization.Spacy;
                 }
             }
+            catch (SerializationException)
+            {
+                Serialization &= ~Serialization.Spacy;
+            }
 
-            if (Serialization.IsDotNet())
+            try
             {
                 var tempDocs = new List<Doc>();
                 _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
+
+                Serialization |= Serialization.DotNet;
             }
-        }
-
-        public Serialization Serialization
-        {
-            get => _serialization;
-
-            set
+            catch (SerializationException)
             {
-                _serialization = value;
-                foreach (var doc in _docs)
-                    doc.Serialization = value;
+                Serialization &= ~Serialization.DotNet;
             }
         }
+
+        public Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public void Add(Doc doc)
         {

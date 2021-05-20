@@ -26,7 +26,7 @@ namespace SpacyDotNet
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            try
             {
                 var dummyBytes = new byte[1];
 
@@ -38,7 +38,13 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     _pyVocab.from_bytes(pyBytes);
+
+                    Serialization |= Serialization.Spacy;
                 }
+            }
+            catch (SerializationException)
+            {
+                Serialization &= ~Serialization.Spacy;
             }
         }
 

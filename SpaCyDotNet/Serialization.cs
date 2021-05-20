@@ -1,22 +1,24 @@
-﻿namespace SpacyDotNet
+﻿using System;
+
+namespace SpacyDotNet
 {
+    [Flags]
     public enum Serialization
     {
-        Spacy,
-        SpacyAndDotNet,
-        DotNet
+        Spacy = 1,
+        DotNet = 2
     }
 
     public static class SerializationEx
     {
         public static bool IsSpacy(this Serialization value)
         {
-            return value == Serialization.Spacy || value == Serialization.SpacyAndDotNet;
+            return (value & Serialization.Spacy) != 0;
         }
 
         public static bool IsDotNet(this Serialization value)
         {
-            return value == Serialization.SpacyAndDotNet || value == Serialization.DotNet;
+            return (value & Serialization.DotNet) != 0;
         }
     }
 }

@@ -20,8 +20,6 @@ namespace SpacyDotNet
         private List<Span> _nounChunks;
         private List<Span> _ents;
 
-        private Serialization _serialization = Serialization.Spacy;
-
         public Doc()
         {
             // Needed for ISerializable interface
@@ -29,7 +27,7 @@ namespace SpacyDotNet
 
         protected Doc(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            try
             {
                 var dummyBytes = new byte[1];
 
@@ -42,10 +40,16 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     PyDoc.from_bytes(pyBytes);
+
+                    Serialization |= Serialization.Spacy;
                 }
             }
+            catch (SerializationException)
+            {
+                Serialization &= ~Serialization.Spacy;
+            }
 
-            if (Serialization.IsDotNet())
+            try
             {
                 var tempVocab = new Vocab();
                 _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
@@ -57,6 +61,12 @@ namespace SpacyDotNet
                 _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
                 _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
                 _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
+
+                Serialization |= Serialization.DotNet;
+            }
+            catch (SerializationException)
+            {
+                Serialization &= ~Serialization.DotNet;
             }
         }
 
@@ -78,18 +88,9 @@ namespace SpacyDotNet
             _vocab = null;
         }
 
-        internal dynamic PyDoc { get; set; }            
+        internal dynamic PyDoc { get; set; }
 
-        public Serialization Serialization
-        { 
-            get => _serialization;
-
-            set
-            {
-                _serialization = value;
-                _vocab.Serialization = value;
-            }
-        }
+        public Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public string Text
         {
