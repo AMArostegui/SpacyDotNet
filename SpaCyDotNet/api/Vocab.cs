@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Numerics;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using Python.Runtime;
 
 namespace SpacyDotNet
@@ -53,7 +50,7 @@ namespace SpacyDotNet
         internal dynamic PyObj
             { get => _pyVocab; }
 
-        public static Serialization Serialization { get; set; } = Serialization.Spacy;
+        public Serialization Serialization { get; set; } = Serialization.Spacy;
 
         public Lexeme this[object key]
         {

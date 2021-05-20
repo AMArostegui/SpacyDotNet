@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,6 +10,8 @@ namespace SpacyDotNet
     [Serializable]
     public class Doc : ISerializable
     {
+        private string _text;
+
         private Vocab _vocab;
 
         private List<Token> _tokens;
@@ -18,6 +19,8 @@ namespace SpacyDotNet
         private List<Span> _sentences;
         private List<Span> _nounChunks;
         private List<Span> _ents;
+
+        private Serialization _serialization = Serialization.Spacy;
 
         public Doc()
         {
@@ -77,7 +80,24 @@ namespace SpacyDotNet
 
         internal dynamic PyDoc { get; set; }            
 
-        public static Serialization Serialization { get; set; } = Serialization.Spacy;
+        public Serialization Serialization
+        { 
+            get => _serialization;
+
+            set
+            {
+                _serialization = value;
+                _vocab.Serialization = value;
+            }
+        }
+
+        public string Text
+        {
+            get
+            {
+                return Interop.GetString(PyDoc?.text, ref _text);
+            }
+        }
 
         public List<Token> Tokens
         {

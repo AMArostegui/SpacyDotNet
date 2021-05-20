@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -13,6 +12,8 @@ namespace SpacyDotNet
     {
         private dynamic _pyDocBin;
         private List<Doc> _docs;
+
+        private Serialization _serialization = Serialization.Spacy;
 
         public DocBin()
         {
@@ -67,7 +68,17 @@ namespace SpacyDotNet
             }
         }
 
-        public static Serialization Serialization { get; set; } = Serialization.Spacy;
+        public Serialization Serialization
+        {
+            get => _serialization;
+
+            set
+            {
+                _serialization = value;
+                foreach (var doc in _docs)
+                    doc.Serialization = value;
+            }
+        }
 
         public void Add(Doc doc)
         {
@@ -173,12 +184,7 @@ namespace SpacyDotNet
             }
 
             if (Serialization.IsDotNet())
-            {
-                Doc.Serialization = Serialization.DotNet;
-                Vocab.Serialization = Serialization.Spacy;
-
                 info.AddValue("Docs", _docs);
-            }
         }
 
         private void Copy(DocBin docBin)
