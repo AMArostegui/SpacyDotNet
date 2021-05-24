@@ -23,7 +23,7 @@ It's been tested under **Windows 10** and **Ubuntu Linux 20.04**, using the foll
 
 Furthermore, it might work under different libraries:
 
-- .NET Core 3.0 should be fine. .NET 5.0 is a major release that I haven't tried so far. I haven't tried .NET Framework either
+- .NET Core 3.0 and 2.1 should be fine. .NET 5.0 is a major release that I haven't tried so far. I haven't tried .NET Framework either
 - It should work with spaCy 2.3.5 and any other spaCy version that changes only its minor/patch version number
 
 The current version of Python.NET has been compiled against Python 3.8 so the virtual environment must be created under this version. In general we should honor the specified Python.NET compiled CPython version
