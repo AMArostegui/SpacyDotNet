@@ -72,7 +72,7 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 dynamic spacy = Py.Import("spacy");
-                dynamic pyVocab = vocab.PyObj;
+                dynamic pyVocab = vocab.PyVocab;
                 PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
             }
         }

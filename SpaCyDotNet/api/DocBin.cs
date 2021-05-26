@@ -178,7 +178,7 @@ namespace SpacyDotNet
 
         public List<Doc> GetDocs(Vocab vocab)
         {
-            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyObj), ref _docs);
+            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -221,6 +221,7 @@ namespace SpacyDotNet
                         {
                             dynamic pyDoc = pyDocs.__next__();
                             _docs[i].PyDoc = pyDoc;
+                            _docs[i].Vocab.PyVocab = pyDoc.vocab;
                             i++;
                         }
                         catch (PythonException)
