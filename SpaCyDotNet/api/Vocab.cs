@@ -149,9 +149,11 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            Debug.Assert(SerializationMode != SerializationMode.Spacy);
+            var serializationMode = (SerializationMode)context.Context;
 
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
+            Debug.Assert(serializationMode != SerializationMode.Spacy);
+
+            if (serializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {

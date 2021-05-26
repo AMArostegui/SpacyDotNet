@@ -21,8 +21,6 @@ namespace SpacyDotNet
         private List<Span> _nounChunks;
         private List<Span> _ents;
 
-        private SerializationMode _serializationMode;
-
         public Doc()
         {
             // Needed for ISerializable interface
@@ -30,9 +28,9 @@ namespace SpacyDotNet
 
         protected Doc(SerializationInfo info, StreamingContext context)
         {
-            _serializationMode = (SerializationMode)context.Context;
+            SerializationMode = (SerializationMode)context.Context;
 
-            if (_serializationMode == SerializationMode.SpacyAndDotNet)
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 var dummyBytes = new byte[1];
 
@@ -49,7 +47,7 @@ namespace SpacyDotNet
                 }
             }
 
-            Debug.Assert(_serializationMode != SerializationMode.Spacy);
+            Debug.Assert(SerializationMode != SerializationMode.Spacy);
 
             _text = info.GetString("Text");
 
@@ -85,17 +83,7 @@ namespace SpacyDotNet
 
         internal dynamic PyDoc { get; set; }
 
-        public SerializationMode SerializationMode
-        {
-            get => _serializationMode;
-
-            set
-            {
-                _serializationMode = value;
-                if (_vocab != null)
-                    _vocab.SerializationMode = value;
-            }
-        }
+        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public string Text
         {
@@ -165,8 +153,9 @@ namespace SpacyDotNet
             }
             else
             {
-                var formatter = new BinaryFormatter();
                 using var stream = new FileStream(path, FileMode.Create);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
                 formatter.Serialize(stream, this);
             }
         }
@@ -185,7 +174,7 @@ namespace SpacyDotNet
             {
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
                 var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, _serializationMode);
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
                 var doc = (Doc)formatter.Deserialize(stream);
                 Copy(doc);
             }
@@ -202,8 +191,9 @@ namespace SpacyDotNet
             }
             else
             {
-                var formatter = new BinaryFormatter();
                 var stream = new MemoryStream();
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
                 formatter.Serialize(stream, this);
                 return stream.ToArray();
             }
@@ -223,7 +213,7 @@ namespace SpacyDotNet
             {
                 var stream = new MemoryStream(bytes);
                 var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, _serializationMode);
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
                 var doc = (Doc)formatter.Deserialize(stream);
                 Copy(doc);
             }
@@ -231,7 +221,9 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (_serializationMode == SerializationMode.SpacyAndDotNet)
+            var serializationMode = (SerializationMode)context.Context;
+
+            if (serializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
@@ -240,7 +232,7 @@ namespace SpacyDotNet
                 }
             }
 
-            Debug.Assert(_serializationMode != SerializationMode.Spacy);
+            Debug.Assert(serializationMode != SerializationMode.Spacy);
 
             // Using the property is important form the members to be loaded
             info.AddValue("Text", Text);
