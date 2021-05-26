@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.Serialization;
 using Python.Runtime;
@@ -40,6 +41,8 @@ namespace SpacyDotNet
                     PyVocab.from_bytes(pyBytes);
                 }
             }
+
+            Debug.Assert(SerializationMode != SerializationMode.Spacy);
         }
 
         internal Vocab(dynamic vocab)
@@ -146,6 +149,8 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            Debug.Assert(SerializationMode != SerializationMode.Spacy);
+
             if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
