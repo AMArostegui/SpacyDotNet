@@ -77,8 +77,11 @@ namespace SpacyDotNet
             set
             {
                 _serializationMode = value;
-                foreach (var doc in _docs)
-                    doc.SerializationMode = value;
+                if (_docs != null)
+                {
+                    foreach (var doc in _docs)
+                        doc.SerializationMode = value;
+                }
             }        
         }
 
@@ -196,8 +199,12 @@ namespace SpacyDotNet
 
         private void Copy(DocBin docBin)
         {
-            _pyDocBin = docBin._pyDocBin;
             _docs = docBin._docs;
+
+            // I'd rather copy Python object no matter the serialization mode
+            // If set to DotNet, the variable will be initialized to null
+            // disregarding its current value which might be a default object
+            _pyDocBin = docBin._pyDocBin;
 
             if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {

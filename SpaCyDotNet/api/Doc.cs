@@ -51,6 +51,8 @@ namespace SpacyDotNet
 
             Debug.Assert(_serializationMode != SerializationMode.Spacy);
 
+            _text = info.GetString("Text");
+
             var tempVocab = new Vocab();
             _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
 
@@ -90,7 +92,8 @@ namespace SpacyDotNet
             set
             {
                 _serializationMode = value;
-                _vocab.SerializationMode = value;
+                if (_vocab != null)
+                    _vocab.SerializationMode = value;
             }
         }
 
@@ -240,6 +243,7 @@ namespace SpacyDotNet
             Debug.Assert(_serializationMode != SerializationMode.Spacy);
 
             // Using the property is important form the members to be loaded
+            info.AddValue("Text", Text);
             info.AddValue("Vocab", Vocab);
             info.AddValue("Tokens", Tokens);
             info.AddValue("Sentences", Sents);
@@ -248,15 +252,18 @@ namespace SpacyDotNet
         }
 
         private void Copy(Doc doc)
-        {            
+        {
+            // I'd rather copy Python object no matter the serialization mode
+            // If set to DotNet, the variable will be initialized to null
+            // disregarding its current value which might be a default object
+            PyDoc = doc.PyDoc;
+
+            _text = doc._text;
             _vocab = doc._vocab;
             _tokens = doc._tokens;
             _sentences = doc._sentences;
             _nounChunks = doc._nounChunks;
-            _ents = doc._ents;
-
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
-                PyDoc = doc.PyDoc;
+            _ents = doc._ents;                
         }
     }
 }

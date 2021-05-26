@@ -67,12 +67,16 @@ namespace SpacyDotNet
                         return _dictStr2Lex[keyStr];
 
                     Lexeme lexeme = null;
-                    using (Py.GIL())
+
+                    if (_pyVocab != null)
                     {
-                        var pyStr = new PyString(keyStr);
-                        var dynPyObj = _pyVocab.__getitem__(pyStr);
-                        lexeme = new Lexeme(dynPyObj);                        
-                        _dictStr2Lex.Add(keyStr, lexeme);
+                        using (Py.GIL())
+                        {
+                            var pyStr = new PyString(keyStr);
+                            var dynPyObj = _pyVocab.__getitem__(pyStr);
+                            lexeme = new Lexeme(dynPyObj);
+                            _dictStr2Lex.Add(keyStr, lexeme);
+                        }
                     }
 
                     return lexeme;
@@ -86,11 +90,15 @@ namespace SpacyDotNet
                         return _dictLong2Lex[keyHash];
 
                     Lexeme lexeme = null;
-                    using (Py.GIL())
+
+                    if (_pyVocab != null)
                     {
-                        var dynPyObj = _pyVocab.__getitem__(key);
-                        lexeme = new Lexeme(dynPyObj);                        
-                        _dictLong2Lex.Add(keyHash, lexeme);
+                        using (Py.GIL())
+                        {
+                            var dynPyObj = _pyVocab.__getitem__(key);
+                            lexeme = new Lexeme(dynPyObj);
+                            _dictLong2Lex.Add(keyHash, lexeme);
+                        }
                     }
 
                     return lexeme;
