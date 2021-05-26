@@ -14,6 +14,8 @@ namespace SpacyDotNet
         private dynamic _pyDocBin;
         private List<Doc> _docs;
 
+        private SerializationMode _serializationMode;
+
         public DocBin()
         {
             using (Py.GIL())
@@ -45,7 +47,9 @@ namespace SpacyDotNet
 
         protected DocBin(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            _serializationMode = (SerializationMode)context.Context;
+
+            if (_serializationMode == SerializationMode.SpacyAndDotNet)
             {
                 var dummyBytes = new byte[1];
 
@@ -60,19 +64,30 @@ namespace SpacyDotNet
                 }
             }
 
-            if (Serialization.IsDotNet())
-            {
-                var tempDocs = new List<Doc>();
-                _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
-            }
+            Debug.Assert(_serializationMode != SerializationMode.Spacy);
+
+            var tempDocs = new List<Doc>();
+            _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
         }
 
-        public static Serialization Serialization { get; set; } = Serialization.Spacy;
+        public SerializationMode SerializationMode
+        {
+            get => _serializationMode;
+
+            set
+            {
+                _serializationMode = value;
+                foreach (var doc in _docs)
+                    doc.SerializationMode = value;
+            }        
+        }
 
         public void Add(Doc doc)
         {
             if (_docs == null)
                 _docs = new List<Doc>();
+
+            doc.SerializationMode = SerializationMode;
             _docs.Add(doc);
 
             using (Py.GIL())
@@ -84,7 +99,7 @@ namespace SpacyDotNet
 
         public byte[] ToBytes()
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -102,7 +117,7 @@ namespace SpacyDotNet
 
         public void FromBytes(byte[] bytes)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -111,9 +126,10 @@ namespace SpacyDotNet
                 }
             }
             else
-            {
-                var formatter = new BinaryFormatter();
+            {                
                 var stream = new MemoryStream(bytes);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, _serializationMode);
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -121,7 +137,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string pathFile)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -139,7 +155,7 @@ namespace SpacyDotNet
 
         public void FromDisk(string pathFile)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -149,8 +165,9 @@ namespace SpacyDotNet
             }
             else
             {
-                var formatter = new BinaryFormatter();
                 using var stream = new FileStream(pathFile, FileMode.Open, FileAccess.Read);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, _serializationMode);
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -163,7 +180,7 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
@@ -172,13 +189,9 @@ namespace SpacyDotNet
                 }
             }
 
-            if (Serialization.IsDotNet())
-            {
-                Doc.Serialization = Serialization.DotNet;
-                Vocab.Serialization = Serialization.Spacy;
+            Debug.Assert(_serializationMode != SerializationMode.Spacy);
 
-                info.AddValue("Docs", _docs);
-            }
+            info.AddValue("Docs", _docs);
         }
 
         private void Copy(DocBin docBin)
@@ -186,27 +199,27 @@ namespace SpacyDotNet
             _pyDocBin = docBin._pyDocBin;
             _docs = docBin._docs;
 
-            if (!Serialization.IsSpacy())
-                return;
-
-            using (Py.GIL())
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
-                dynamic spacy = Py.Import("spacy");
-                dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
-
-                var i = 0;
-                while (true)
+                using (Py.GIL())
                 {
-                    try
+                    dynamic spacy = Py.Import("spacy");
+                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                    dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
+
+                    var i = 0;
+                    while (true)
                     {
-                        dynamic pyDoc = pyDocs.__next__();
-                        _docs[i].PyDoc = pyDoc;
-                        i++;
-                    }
-                    catch (PythonException)
-                    {
-                        break;
+                        try
+                        {
+                            dynamic pyDoc = pyDocs.__next__();
+                            _docs[i].PyDoc = pyDoc;
+                            i++;
+                        }
+                        catch (PythonException)
+                        {
+                            break;
+                        }
                     }
                 }
             }

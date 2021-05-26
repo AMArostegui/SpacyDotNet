@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Numerics;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using Python.Runtime;
 
 namespace SpacyDotNet
@@ -29,7 +26,9 @@ namespace SpacyDotNet
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            SerializationMode = (SerializationMode)context.Context;
+
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 var dummyBytes = new byte[1];
 
@@ -41,6 +40,8 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     _pyVocab.from_bytes(pyBytes);
+
+                    SerializationMode |= SerializationMode.Spacy;
                 }
             }
         }
@@ -53,7 +54,7 @@ namespace SpacyDotNet
         internal dynamic PyObj
             { get => _pyVocab; }
 
-        public static Serialization Serialization { get; set; } = Serialization.Spacy;
+        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public Lexeme this[object key]
         {
@@ -117,7 +118,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            if (Serialization != Serialization.Spacy)
+            if (SerializationMode != SerializationMode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
@@ -129,7 +130,7 @@ namespace SpacyDotNet
 
         public void FromDisk(string path)
         {
-            if (Serialization != Serialization.Spacy)
+            if (SerializationMode != SerializationMode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
@@ -141,7 +142,7 @@ namespace SpacyDotNet
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
