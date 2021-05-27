@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.Serialization;
 using Python.Runtime;
@@ -9,8 +10,6 @@ namespace SpacyDotNet
     [Serializable]
     public class Vocab : ISerializable
     {
-        private dynamic _pyVocab;
-
         private Dictionary<string, Lexeme> _dictStr2Lex = new Dictionary<string, Lexeme>();
         private Dictionary<BigInteger, Lexeme> _dictLong2Lex = new Dictionary<BigInteger, Lexeme>();
         private StringStore _stringStore = null;
@@ -20,13 +19,15 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 dynamic spacy = Py.Import("spacy");
-                _pyVocab = spacy.vocab.Vocab.__call__();
+                PyVocab = spacy.vocab.Vocab.__call__();
             }
         }
 
         protected Vocab(SerializationInfo info, StreamingContext context)
         {
-            try
+            SerializationMode = (SerializationMode)context.Context;
+
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 var dummyBytes = new byte[1];
 
@@ -34,29 +35,25 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
-                    _pyVocab = spacy.vocab.Vocab.__call__();
+                    PyVocab = spacy.vocab.Vocab.__call__();
 
                     var pyBytes = ToPython.GetBytes(bytes);
-                    _pyVocab.from_bytes(pyBytes);
-
-                    Serialization |= Serialization.Spacy;
+                    PyVocab.from_bytes(pyBytes);
                 }
             }
-            catch (SerializationException)
-            {
-                Serialization &= ~Serialization.Spacy;
-            }
+
+            Debug.Assert(SerializationMode != SerializationMode.Spacy);
         }
 
         internal Vocab(dynamic vocab)
         {
-            _pyVocab = vocab;
+            PyVocab = vocab;
         }
 
-        internal dynamic PyObj
-            { get => _pyVocab; }
+        internal dynamic PyVocab
+            { get; set; }
 
-        public Serialization Serialization { get; set; } = Serialization.Spacy;
+        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public Lexeme this[object key]
         {
@@ -69,12 +66,16 @@ namespace SpacyDotNet
                         return _dictStr2Lex[keyStr];
 
                     Lexeme lexeme = null;
-                    using (Py.GIL())
+
+                    if (PyVocab != null)
                     {
-                        var pyStr = new PyString(keyStr);
-                        var dynPyObj = _pyVocab.__getitem__(pyStr);
-                        lexeme = new Lexeme(dynPyObj);                        
-                        _dictStr2Lex.Add(keyStr, lexeme);
+                        using (Py.GIL())
+                        {
+                            var pyStr = new PyString(keyStr);
+                            var dynPyObj = PyVocab.__getitem__(pyStr);
+                            lexeme = new Lexeme(dynPyObj);
+                            _dictStr2Lex.Add(keyStr, lexeme);
+                        }
                     }
 
                     return lexeme;
@@ -88,11 +89,15 @@ namespace SpacyDotNet
                         return _dictLong2Lex[keyHash];
 
                     Lexeme lexeme = null;
-                    using (Py.GIL())
+
+                    if (PyVocab != null)
                     {
-                        var dynPyObj = _pyVocab.__getitem__(key);
-                        lexeme = new Lexeme(dynPyObj);                        
-                        _dictLong2Lex.Add(keyHash, lexeme);
+                        using (Py.GIL())
+                        {
+                            var dynPyObj = PyVocab.__getitem__(key);
+                            lexeme = new Lexeme(dynPyObj);
+                            _dictLong2Lex.Add(keyHash, lexeme);
+                        }
                     }
 
                     return lexeme;
@@ -111,7 +116,7 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    var stringStore = _pyVocab.strings;
+                    var stringStore = PyVocab.strings;
                     _stringStore = new StringStore(stringStore);
                     return _stringStore;
                 }
@@ -120,35 +125,39 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            if (Serialization != Serialization.Spacy)
+            if (SerializationMode != SerializationMode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _pyVocab.to_disk(pyPath);
+                PyVocab.to_disk(pyPath);
             }
         }
 
         public void FromDisk(string path)
         {
-            if (Serialization != Serialization.Spacy)
+            if (SerializationMode != SerializationMode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
             {
                 var pyPath = new PyString(path);
-                _pyVocab.from_disk(pyPath);
+                PyVocab.from_disk(pyPath);
             }
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            var serializationMode = (SerializationMode)context.Context;
+
+            Debug.Assert(serializationMode != SerializationMode.Spacy);
+
+            if (serializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Interop.GetBytes(_pyVocab.to_bytes());
+                    var pyObj = Interop.GetBytes(PyVocab.to_bytes());
                     info.AddValue("PyObj", pyObj);
                 }
             }

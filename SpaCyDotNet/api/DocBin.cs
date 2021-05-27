@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -44,7 +45,9 @@ namespace SpacyDotNet
 
         protected DocBin(SerializationInfo info, StreamingContext context)
         {
-            try
+            SerializationMode = (SerializationMode)context.Context;
+
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
                 var dummyBytes = new byte[1];
 
@@ -56,34 +59,22 @@ namespace SpacyDotNet
 
                     var pyBytes = ToPython.GetBytes(bytes);
                     _pyDocBin.from_bytes(pyBytes);
-
-                    Serialization |= Serialization.Spacy;
                 }
             }
-            catch (SerializationException)
-            {
-                Serialization &= ~Serialization.Spacy;
-            }
 
-            try
-            {
-                var tempDocs = new List<Doc>();
-                _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
+            Debug.Assert(SerializationMode != SerializationMode.Spacy);
 
-                Serialization |= Serialization.DotNet;
-            }
-            catch (SerializationException)
-            {
-                Serialization &= ~Serialization.DotNet;
-            }
+            var tempDocs = new List<Doc>();
+            _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
         }
 
-        public Serialization Serialization { get; set; } = Serialization.Spacy;
+        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public void Add(Doc doc)
         {
             if (_docs == null)
                 _docs = new List<Doc>();
+
             _docs.Add(doc);
 
             using (Py.GIL())
@@ -95,7 +86,7 @@ namespace SpacyDotNet
 
         public byte[] ToBytes()
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -103,9 +94,10 @@ namespace SpacyDotNet
                 }
             }
             else
-            {
-                var formatter = new BinaryFormatter();
+            {                
                 var stream = new MemoryStream();
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
                 formatter.Serialize(stream, this);
                 return stream.ToArray();
             }
@@ -113,7 +105,7 @@ namespace SpacyDotNet
 
         public void FromBytes(byte[] bytes)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -122,9 +114,10 @@ namespace SpacyDotNet
                 }
             }
             else
-            {
-                var formatter = new BinaryFormatter();
+            {                
                 var stream = new MemoryStream(bytes);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -132,7 +125,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string pathFile)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -142,15 +135,16 @@ namespace SpacyDotNet
             }
             else
             {
-                var formatter = new BinaryFormatter();
                 using var stream = new FileStream(pathFile, FileMode.Create);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
                 formatter.Serialize(stream, this);
             }
         }
 
         public void FromDisk(string pathFile)
         {
-            if (Serialization == Serialization.Spacy)
+            if (SerializationMode == SerializationMode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -160,8 +154,9 @@ namespace SpacyDotNet
             }
             else
             {
-                var formatter = new BinaryFormatter();
                 using var stream = new FileStream(pathFile, FileMode.Open, FileAccess.Read);
+                var formatter = new BinaryFormatter();
+                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -169,12 +164,14 @@ namespace SpacyDotNet
 
         public List<Doc> GetDocs(Vocab vocab)
         {
-            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyObj), ref _docs);
+            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Serialization.IsSpacy())
+            var serializationMode = (SerializationMode)context.Context;
+
+            if (serializationMode == SerializationMode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
@@ -183,36 +180,42 @@ namespace SpacyDotNet
                 }
             }
 
-            if (Serialization.IsDotNet())
-                info.AddValue("Docs", _docs);
+            Debug.Assert(serializationMode != SerializationMode.Spacy);
+
+            info.AddValue("Docs", _docs);
         }
 
         private void Copy(DocBin docBin)
         {
-            _pyDocBin = docBin._pyDocBin;
             _docs = docBin._docs;
 
-            if (!Serialization.IsSpacy())
-                return;
+            // I'd rather copy Python object no matter the serialization mode
+            // If set to DotNet, the variable will be initialized to null
+            // disregarding its current value which might be a default object
+            _pyDocBin = docBin._pyDocBin;
 
-            using (Py.GIL())
+            if (SerializationMode == SerializationMode.SpacyAndDotNet)
             {
-                dynamic spacy = Py.Import("spacy");
-                dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
-
-                var i = 0;
-                while (true)
+                using (Py.GIL())
                 {
-                    try
+                    dynamic spacy = Py.Import("spacy");
+                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                    dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
+
+                    var i = 0;
+                    while (true)
                     {
-                        dynamic pyDoc = pyDocs.__next__();
-                        _docs[i].PyDoc = pyDoc;
-                        i++;
-                    }
-                    catch (PythonException)
-                    {
-                        break;
+                        try
+                        {
+                            dynamic pyDoc = pyDocs.__next__();
+                            _docs[i].PyDoc = pyDoc;
+                            _docs[i].Vocab.PyVocab = pyDoc.vocab;
+                            i++;
+                        }
+                        catch (PythonException)
+                        {
+                            break;
+                        }
                     }
                 }
             }
