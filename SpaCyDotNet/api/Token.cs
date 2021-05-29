@@ -219,7 +219,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListWrapperObj(_pyToken?.children, ref _children);
+                return Interop.GetListFromCollection(_pyToken?.children, ref _children);
             }
         }
 

@@ -92,7 +92,18 @@ namespace SpacyDotNet
             }
         }
 
-        public static List<T> GetListWrapperObj<T>(dynamic dynIterPy, ref List<T> lstMember) where T: new()
+        public static List<T> GetListFromGenerator<T>(dynamic pyGenerator, ref List<T> lstMember) where T : new()
+        {
+            if (lstMember != null)
+                return lstMember;
+
+            dynamic builtins = Py.Import("builtins");
+            dynamic list = builtins.list(pyGenerator);
+
+            return GetListFromCollection(list, ref lstMember);
+        }
+
+        public static List<T> GetListFromCollection<T>(dynamic pyCollection, ref List<T> lstMember) where T: new()
         {
             if (lstMember != null)
                 return lstMember;
@@ -101,30 +112,27 @@ namespace SpacyDotNet
             {
                 lstMember = new List<T>();
 
-                var iter = dynIterPy.__iter__();
-                while (true)
+                dynamic builtins = Py.Import("builtins");
+                var pyCount = new PyInt(builtins.len(pyCollection));
+                var count = pyCount.ToInt32();
+
+                for (var i = 0; i < count; i++)
                 {
-                    try
-                    {
-                        var element = iter.__next__();
+                    var element = pyCollection[i];
 
-                        Binder binder = null;
-                        BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-                        CultureInfo culture = null;
-                        var parameters = new object[] { element };
+                    Binder binder = null;
+                    BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+                    CultureInfo culture = null;
+                    var parameters = new object[] { element };
 
-                        lstMember.Add((T)Activator.CreateInstance(typeof(T), flags, binder, parameters, culture));
-                    }
-                    catch (PythonException)
-                    {
-                        break;
-                    }
+                    lstMember.Add((T)Activator.CreateInstance(typeof(T), flags, binder, parameters, culture));
                 }
+
                 return lstMember;
             }
         }
 
-        public static List<T> GetListBuiltInType<T>(dynamic dynIterPy, ref List<T> lstMember)
+        public static List<T> GetListFromList<T>(dynamic pyList, ref List<T> lstMember)
         {
             if (lstMember != null)
                 return lstMember;
@@ -133,32 +141,29 @@ namespace SpacyDotNet
             {
                 lstMember = new List<T>();
 
-                var iter = dynIterPy.__iter__();
-                while (true)
+                dynamic builtins = Py.Import("builtins");
+                var pyCount = new PyInt(builtins.len(pyList));
+                var count = pyCount.ToInt32();
+
+                for (var i = 0; i < count; i++)
                 {
-                    try
-                    {
-                        var element = iter.__next__();
+                    var element = pyList[i];
 
-                        object created = null;
-                        if (typeof(T) == typeof(string))
-                        {
-                            var pyObj = new PyString(element);
-                            created = pyObj.ToString();
-                        }
-                        else
-                        {
-                            Debug.Assert(false);
-                            return null;
-                        }                            
-
-                        lstMember.Add((T)created);
-                    }
-                    catch (PythonException)
+                    object created = null;
+                    if (typeof(T) == typeof(string))
                     {
-                        break;
+                        var pyObj = new PyString(element);
+                        created = pyObj.ToString();
                     }
+                    else
+                    {
+                        Debug.Assert(false);
+                        return null;
+                    }                            
+
+                    lstMember.Add((T)created);
                 }
+
                 return lstMember;
             }
         }

@@ -164,7 +164,7 @@ namespace SpacyDotNet
 
         public List<Doc> GetDocs(Vocab vocab)
         {
-            return Interop.GetListWrapperObj(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
+            return Interop.GetListFromGenerator(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -199,23 +199,21 @@ namespace SpacyDotNet
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
+
                     dynamic pyVocab = spacy.vocab.Vocab.__call__();
                     dynamic pyDocs = _pyDocBin.get_docs(pyVocab);
 
-                    var i = 0;
-                    while (true)
+                    dynamic builtins = Py.Import("builtins");
+                    dynamic listDocs = builtins.list(pyDocs);
+
+                    var pyCount = new PyInt(builtins.len(listDocs));
+                    var count = pyCount.ToInt32();
+
+                    for (var i = 0; i < count; i++)
                     {
-                        try
-                        {
-                            dynamic pyDoc = pyDocs.__next__();
-                            _docs[i].PyDoc = pyDoc;
-                            _docs[i].Vocab.PyVocab = pyDoc.vocab;
-                            i++;
-                        }
-                        catch (PythonException)
-                        {
-                            break;
-                        }
+                        dynamic pyDoc = listDocs[i];
+                        _docs[i].PyDoc = pyDoc;
+                        _docs[i].Vocab.PyVocab = pyDoc.vocab;
                     }
                 }
             }

@@ -47,7 +47,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListBuiltInType<string>(_pyLang?.pipe_names, ref _pipeNames);
+                return Interop.GetListFromList<string>(_pyLang?.pipe_names, ref _pipeNames);
             }
         }
 

@@ -97,7 +97,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListWrapperObj(PyDoc, ref _tokens);
+                return Interop.GetListFromCollection(PyDoc, ref _tokens);
             }
         }
 
@@ -105,7 +105,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListWrapperObj(PyDoc?.sents, ref _sentences);
+                return Interop.GetListFromGenerator(PyDoc?.sents, ref _sentences);
             }
         }
 
@@ -113,7 +113,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListWrapperObj(PyDoc?.noun_chunks, ref _nounChunks);
+                return Interop.GetListFromGenerator(PyDoc?.noun_chunks, ref _nounChunks);
             }
         }
 
@@ -121,7 +121,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListWrapperObj(PyDoc?.ents, ref _ents);
+                return Interop.GetListFromGenerator(PyDoc?.ents, ref _ents);
             }
         }
 
