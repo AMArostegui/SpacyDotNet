@@ -60,9 +60,10 @@ namespace SpacyDotNet
             _vectorNorm = (double)info.GetValue("VectorNorm", tempDouble.GetType());
             _isOov = (bool)info.GetValue("IsOov", tempBool.GetType());
 
-            // TODO: This needs to be reviewed
-            //var tempToken = new Token();
-            //_head = (Token)info.GetValue("Head", tempToken.GetType());
+            var tempToken = new Token();
+            _head = (Token)info.GetValue("Head", tempToken.GetType());
+            if (_head == null)
+                _head = this;
         }
 
         internal Token(dynamic token)
@@ -209,7 +210,13 @@ namespace SpacyDotNet
 
                 using (Py.GIL())
                 {
-                    _head = new Token(_pyToken.head);
+                    var pyHeadIsSelf = new PyInt(_pyToken.head.__eq__(_pyToken));
+                    var headIsSelf = pyHeadIsSelf.ToInt32() != 0;
+                    if (headIsSelf)
+                        _head = this;
+                    else
+                        _head = new Token(_pyToken.head);
+
                     return _head;
                 }
             }
@@ -259,18 +266,13 @@ namespace SpacyDotNet
             info.AddValue("HasVector", HasVector);
             info.AddValue("VectorNorm", VectorNorm);
             info.AddValue("IsOov", IsOov);
-            
-            var headIsSelf = false;
-            var pyHead = Head.PyObj;
-            using (Py.GIL())
-            {
-                var pyHeadIsSelf = new PyInt(_pyToken.__eq__(pyHead));
-                headIsSelf = pyHeadIsSelf.ToInt32() != 0;
-            }
 
-            // TODO: This needs to be reviewed
-            if (!headIsSelf)
-                info.AddValue("Head", Head);
+            var head = Head;
+            if (head == this)
+                info.AddValue("Head", null);
+            else
+                info.AddValue("Head", head);
+
             //info.AddValue("Children", Children);
         }
     }
