@@ -75,10 +75,11 @@ namespace SpacyDotNet
             }
         }
 
-        internal Doc(dynamic doc)
+        internal Doc(dynamic doc, string text)
         {
             PyDoc = doc;
             _vocab = null;
+            _text = text;
         }
 
         internal dynamic PyDoc { get; set; }

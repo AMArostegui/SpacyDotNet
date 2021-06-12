@@ -42,7 +42,7 @@ namespace SpacyDotNet
             {
                 var pyString = new PyString(text);
                 dynamic doc = _pyLang.__call__(pyString);
-                return new Doc(doc);
+                return new Doc(doc, text);
             }
         }
 
