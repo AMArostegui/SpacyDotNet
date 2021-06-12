@@ -11,11 +11,13 @@ namespace SpacyDotNet
         private dynamic _pyLang;
 
         private List<string> _pipeNames;
+        private PipelineMeta _meta;
 
         internal Lang(dynamic lang)
         {
             _pyLang = lang;
             _pipeNames = null;
+            _meta = new PipelineMeta(this);
         }
 
         protected Lang(SerializationInfo info, StreamingContext context)
@@ -31,6 +33,7 @@ namespace SpacyDotNet
 
             var temp = new List<string>();
             _pipeNames = (List<string>)info.GetValue("Sentences", temp.GetType());
+            _meta = new PipelineMeta(this);
         }
 
         public Doc GetDocument(string text)
@@ -41,6 +44,13 @@ namespace SpacyDotNet
                 dynamic doc = _pyLang.__call__(pyString);
                 return new Doc(doc);
             }
+        }
+
+        internal dynamic PyLang { get => _pyLang; }
+
+        public PipelineMeta Meta
+        {
+            get => _meta;
         }
 
         public List<string> PipeNames
@@ -69,6 +79,44 @@ namespace SpacyDotNet
 
             // Using the property is important form the members to be loaded
             info.AddValue("PipeNames", PipeNames);
+        }
+
+        public class PipelineMeta : Dictionary<string, object>
+        {
+            private Lang _lang;
+
+            public PipelineMeta(Lang lang)
+            {
+                _lang = lang;
+            }
+
+            public new object this[string key]
+            {
+                get
+                {
+                    if (ContainsKey(key))
+                        return base[key];
+
+                    if (_lang.PyLang == null)
+                        return null;
+
+                    object ret = null;
+                    using (Py.GIL())
+                    {
+                        var pyKeyStr = new PyString(key);
+                        var pyObj = (PyObject)_lang.PyLang.meta.__getitem__(pyKeyStr);
+
+                        if (!PyString.IsStringType(pyObj))
+                            throw new NotImplementedException();
+
+                        var pyValStr = new PyString(pyObj);
+                        ret = pyValStr.ToString();
+                        Add(key, ret);
+                    }
+
+                    return ret;
+                }
+            }
         }
     }
 }
