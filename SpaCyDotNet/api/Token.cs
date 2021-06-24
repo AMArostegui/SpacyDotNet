@@ -29,6 +29,8 @@ namespace SpacyDotNet
         private double? _vectorNorm;
         private bool? _isOov;
 
+        private int? _i;
+
         private Token _head;
         private List<Token> _children;
 
@@ -59,6 +61,8 @@ namespace SpacyDotNet
             _hasVector = (bool)info.GetValue("HasVector", tempBool.GetType());
             _vectorNorm = (double)info.GetValue("VectorNorm", tempDouble.GetType());
             _isOov = (bool)info.GetValue("IsOov", tempBool.GetType());
+
+            _i = (int)info.GetValue("I", typeof(int));
 
             var tempToken = new Token();
             _head = (Token)info.GetValue("Head", tempToken.GetType());
@@ -201,6 +205,14 @@ namespace SpacyDotNet
             }
         }
 
+        public int I
+        {
+            get
+            {
+                return Interop.GetInt(_pyToken?.i, ref _i);
+            }
+        }
+
         public Token Head
         {
             get
@@ -266,6 +278,8 @@ namespace SpacyDotNet
             info.AddValue("HasVector", HasVector);
             info.AddValue("VectorNorm", VectorNorm);
             info.AddValue("IsOov", IsOov);
+
+            info.AddValue("I", I);
 
             var head = Head;
             if (head == this)
