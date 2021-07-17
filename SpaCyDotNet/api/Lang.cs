@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Diagnostics;
+using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Lang : ISerializable
+    public class Lang : IXmlSerializable
     {
         private dynamic _pyLang;
 
@@ -17,22 +20,6 @@ namespace SpacyDotNet
         {
             _pyLang = lang;
             _pipeNames = null;
-            _meta = new PipelineMeta(this);
-        }
-
-        protected Lang(SerializationInfo info, StreamingContext context)
-        {
-            var dummyBytes = new byte[1];
-
-            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-            using (Py.GIL())
-            {
-                var pyBytes = ToPython.GetBytes(bytes);
-                _pyLang.from_bytes(pyBytes);
-            }
-
-            var temp = new List<string>();
-            _pipeNames = (List<string>)info.GetValue("Sentences", temp.GetType());
             _meta = new PipelineMeta(this);
         }
 
@@ -69,16 +56,43 @@ namespace SpacyDotNet
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            var dummyBytes = new byte[1];
+
+            Debug.Assert(reader.Name == "PyObj");
+            var bytesB64 = reader.ReadElementContentAsString();
+            var bytes = Convert.FromBase64String(bytesB64);
+            using (Py.GIL())
+            {
+                var pyBytes = ToPython.GetBytes(bytes);
+                _pyLang.from_bytes(pyBytes);
+            }
+
+            Debug.Assert(reader.Name == "PipeNames");
+            var pipeNames = reader.ReadElementContentAsString();
+            _pipeNames = pipeNames.Split(',').ToList();
+
+            // TODO: ¿Esto qué?
+            _meta = new PipelineMeta(this);
+        }
+
+        public void WriteXml(XmlWriter writer)
         {
             using (Py.GIL())
             {
                 var pyObj = Interop.GetBytes(_pyLang.to_bytes());
-                info.AddValue("PyObj", pyObj);
+                var pyObjB64 = Convert.ToBase64String(pyObj);
+                writer.WriteElementString("PyObj", pyObjB64);
             }
 
             // Using the property is important form the members to be loaded
-            info.AddValue("PipeNames", PipeNames);
+            writer.WriteElementString("PipeNames", string.Join(',', PipeNames));
         }
 
         public class PipelineMeta : Dictionary<string, object>

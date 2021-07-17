@@ -1,11 +1,11 @@
-﻿using Python.Runtime;
-using System;
-using System.Runtime.Serialization;
+﻿using System.Diagnostics;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Span : ISerializable
+    public class Span : IXmlSerializable
     {
         private dynamic _pySpan;
 
@@ -16,17 +16,7 @@ namespace SpacyDotNet
 
         public Span()
         {
-            // Needed to use generics and to implement ISerializable
-        }
-
-        protected Span(SerializationInfo info, StreamingContext context)
-        {
-            _text = info.GetString("Text");
-            _label = info.GetString("Label");
-
-            var temp = 0;
-            _startChar = (int)info.GetValue("StartChar", temp.GetType());
-            _endChar = (int)info.GetValue("EndChar", temp.GetType());
+            // Needed to use generics
         }
 
         internal Span(dynamic sentence)
@@ -68,13 +58,35 @@ namespace SpacyDotNet
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Debug.Assert(reader.Name == "Text");
+            _text = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Label");
+            _label = reader.ReadElementContentAsString();
+
+            Debug.Assert(reader.Name == "StartChar");
+            _startChar = reader.ReadElementContentAsInt();
+            Debug.Assert(reader.Name == "EndChar");
+            _endChar = reader.ReadElementContentAsInt();
+        }
+
+        public void WriteXml(XmlWriter writer)
         {
             // Using the property is important form the members to be loaded
-            info.AddValue("Text", Text);
-            info.AddValue("Label", Label);
-            info.AddValue("StartChar", StartChar);
-            info.AddValue("EndChar", EndChar);
+            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Label", Label);
+            writer.WriteStartElement("StartChar");
+            writer.WriteValue(StartChar);
+            writer.WriteEndElement();
+            writer.WriteStartElement("EndChar");
+            writer.WriteValue(EndChar);
+            writer.WriteEndElement();
         }
     }
 }

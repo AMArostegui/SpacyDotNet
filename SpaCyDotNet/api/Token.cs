@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Token : ISerializable
+    public class Token : IXmlSerializable
     {
         private dynamic _pyToken;
 
@@ -32,42 +33,13 @@ namespace SpacyDotNet
         private int? _i;
 
         private Token _head;
+        private int _headPos;
+
         private List<Token> _children;
 
         public Token()
         {
-            // Needed to use generics and to implement ISerializable
-        }
-
-        protected Token(SerializationInfo info, StreamingContext context)
-        {
-            _text = info.GetString("Text");
-            _lemma = info.GetString("Lemma");
-
-            _pos = info.GetString("Pos");
-            _tag = info.GetString("Tag");
-            _dep = info.GetString("Dep");
-            _shape = info.GetString("Shape");
-
-            var tempBool = false;
-            _isAlpha = (bool)info.GetValue("IsAlpha", tempBool.GetType());
-            _isStop = (bool)info.GetValue("IsStop", tempBool.GetType());
-            _isPunct = (bool)info.GetValue("IsPunct", tempBool.GetType());
-            _isDigit = (bool)info.GetValue("IsDigit", tempBool.GetType());
-            _likeNum = (bool)info.GetValue("LikeNum", tempBool.GetType());
-            _likeEMail = (bool)info.GetValue("LikeEMail", tempBool.GetType());
-
-            var tempDouble = 0.0;
-            _hasVector = (bool)info.GetValue("HasVector", tempBool.GetType());
-            _vectorNorm = (double)info.GetValue("VectorNorm", tempDouble.GetType());
-            _isOov = (bool)info.GetValue("IsOov", tempBool.GetType());
-
-            _i = (int)info.GetValue("I", typeof(int));
-
-            var tempToken = new Token();
-            _head = (Token)info.GetValue("Head", tempToken.GetType());
-            if (_head == null)
-                _head = this;
+            // Needed to use generics
         }
 
         internal Token(dynamic token)
@@ -232,6 +204,11 @@ namespace SpacyDotNet
                     return _head;
                 }
             }
+
+            set
+            {
+                _head = value;
+            }
         }
 
         public List<Token> Children
@@ -257,37 +234,122 @@ namespace SpacyDotNet
             return Text;
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Debug.Assert(reader.Name == "Text");
+            _text = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Lemma");
+            _lemma = reader.ReadElementContentAsString();
+
+            Debug.Assert(reader.Name == "Pos");
+            _pos = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Tag");
+            _tag = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Dep");
+            _dep = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Shape");
+            _shape = reader.ReadElementContentAsString();
+
+            Debug.Assert(reader.Name == "IsAlpha");
+            _isAlpha = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "IsStop");
+            _isStop = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "IsPunct");
+            _isPunct = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "IsDigit");
+            _isDigit = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "LikeNum");
+            _likeNum = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "LikeEMail");
+            _likeEMail = reader.ReadElementContentAsBoolean();
+
+            Debug.Assert(reader.Name == "HasVector");
+            _hasVector = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "VectorNorm");
+            _vectorNorm = reader.ReadElementContentAsDouble();
+            Debug.Assert(reader.Name == "IsOov");
+            _isOov = reader.ReadElementContentAsBoolean();
+
+            Debug.Assert(reader.Name == "I");
+            _i = reader.ReadElementContentAsInt();
+
+            Debug.Assert(reader.Name == "Head");
+            var headPosStr = reader.GetAttribute("Pos");
+            if (string.IsNullOrEmpty(headPosStr))
+                _headPos = -1;
+            else
+                _headPos = int.Parse(headPosStr);
+                
+            reader.Skip();
+        }
+
+        public void WriteXml(XmlWriter writer)
         {
             // Using the property is important form the members to be loaded
-            info.AddValue("Text", Text);
-            info.AddValue("Lemma", Lemma);
+            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Lemma", Lemma);
 
-            info.AddValue("Pos", PoS);
-            info.AddValue("Tag", Tag);
-            info.AddValue("Dep", Dep);
-            info.AddValue("Shape", Shape);
+            writer.WriteElementString("Pos", PoS);
+            writer.WriteElementString("Tag", Tag);
+            writer.WriteElementString("Dep", Dep);
+            writer.WriteElementString("Shape", Shape);
 
-            info.AddValue("IsAlpha", IsAlpha);
-            info.AddValue("IsStop", IsStop);
-            info.AddValue("IsPunct", IsPunct);
-            info.AddValue("IsDigit", IsDigit);
-            info.AddValue("LikeNum", LikeNum);
-            info.AddValue("LikeEMail", LikeEMail);
+            writer.WriteStartElement("IsAlpha");
+            writer.WriteValue(IsAlpha);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsStop");
+            writer.WriteValue(IsStop);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsPunct");
+            writer.WriteValue(IsPunct);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsDigit");
+            writer.WriteValue(IsDigit);
+            writer.WriteEndElement();
+            writer.WriteStartElement("LikeNum");
+            writer.WriteValue(LikeNum);
+            writer.WriteEndElement();
+            writer.WriteStartElement("LikeEMail");
+            writer.WriteValue(LikeEMail);
+            writer.WriteEndElement();
 
-            info.AddValue("HasVector", HasVector);
-            info.AddValue("VectorNorm", VectorNorm);
-            info.AddValue("IsOov", IsOov);
+            writer.WriteStartElement("HasVector");
+            writer.WriteValue(HasVector);
+            writer.WriteEndElement();
+            writer.WriteStartElement("VectorNorm");
+            writer.WriteValue(VectorNorm);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsOov");
+            writer.WriteValue(IsOov);
+            writer.WriteEndElement();
 
-            info.AddValue("I", I);
+            writer.WriteStartElement("I");
+            writer.WriteValue(I);
+            writer.WriteEndElement();
 
+            writer.WriteStartElement("Head");
             var head = Head;
             if (head == this)
-                info.AddValue("Head", null);
+                writer.WriteAttributeString("Pos", string.Empty);
             else
-                info.AddValue("Head", head);
+                writer.WriteAttributeString("Pos", head.I.ToString());
+            writer.WriteEndElement();
 
+            // This one was already commented
             //info.AddValue("Children", Children);
+        }
+
+        internal void RestoreHead(List<Token> tokens)
+        {
+            if (_headPos == -1)
+                _head = this;
+            else
+                _head = tokens[_headPos];
         }
     }
 }

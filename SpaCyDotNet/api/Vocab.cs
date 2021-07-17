@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Vocab : ISerializable
+    public class Vocab : IXmlSerializable
     {
         private Dictionary<string, Lexeme> _dictStr2Lex = new Dictionary<string, Lexeme>();
         private Dictionary<BigInteger, Lexeme> _dictLong2Lex = new Dictionary<BigInteger, Lexeme>();
@@ -23,28 +25,6 @@ namespace SpacyDotNet
             }
         }
 
-        protected Vocab(SerializationInfo info, StreamingContext context)
-        {
-            SerializationMode = (SerializationMode)context.Context;
-
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
-            {
-                var dummyBytes = new byte[1];
-
-                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-                using (Py.GIL())
-                {
-                    dynamic spacy = Py.Import("spacy");
-                    PyVocab = spacy.vocab.Vocab.__call__();
-
-                    var pyBytes = ToPython.GetBytes(bytes);
-                    PyVocab.from_bytes(pyBytes);
-                }
-            }
-
-            Debug.Assert(SerializationMode != SerializationMode.Spacy);
-        }
-
         internal Vocab(dynamic vocab)
         {
             PyVocab = vocab;
@@ -52,8 +32,6 @@ namespace SpacyDotNet
 
         internal dynamic PyVocab
             { get; set; }
-
-        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public Lexeme this[object key]
         {
@@ -125,7 +103,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            if (SerializationMode != SerializationMode.Spacy)
+            if (Serialization.Selected != Serialization.Mode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
@@ -137,7 +115,7 @@ namespace SpacyDotNet
 
         public void FromDisk(string path)
         {
-            if (SerializationMode != SerializationMode.Spacy)
+            if (Serialization.Selected != Serialization.Mode.Spacy)
                 throw new NotImplementedException();
 
             using (Py.GIL())
@@ -147,18 +125,51 @@ namespace SpacyDotNet
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public XmlSchema GetSchema()
         {
-            var serializationMode = (SerializationMode)context.Context;
+            return null;
+        }
 
-            Debug.Assert(serializationMode != SerializationMode.Spacy);
+        public void ReadXml(XmlReader reader)
+        {
+            var serializationMode = Serialization.Selected;
 
-            if (serializationMode == SerializationMode.SpacyAndDotNet)
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
+            {
+                reader.ReadStartElement();
+                Debug.Assert(reader.Name == "PyObj");
+                var bytesB64 = reader.ReadElementContentAsString();
+                var bytes = Convert.FromBase64String(bytesB64);
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    PyVocab = spacy.vocab.Vocab.__call__();
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    PyVocab.from_bytes(pyBytes);
+                }
+
+                reader.ReadEndElement();
+            }
+            else
+                reader.Skip();
+
+            Debug.Assert(serializationMode != Serialization.Mode.Spacy);
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            var serializationMode = Serialization.Selected;
+
+            Debug.Assert(serializationMode != Serialization.Mode.Spacy);
+
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
                     var pyObj = Interop.GetBytes(PyVocab.to_bytes());
-                    info.AddValue("PyObj", pyObj);
+                    var pyObjB64 = Convert.ToBase64String(pyObj);
+                    writer.WriteElementString("PyObj", pyObjB64);
                 }
             }
         }

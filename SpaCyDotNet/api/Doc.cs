@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Doc : ISerializable
+    public class Doc : IXmlSerializable
     {
         private string _text;
 
@@ -23,44 +23,6 @@ namespace SpacyDotNet
 
         public Doc()
         {
-            // Needed for ISerializable interface
-        }
-
-        protected Doc(SerializationInfo info, StreamingContext context)
-        {
-            SerializationMode = (SerializationMode)context.Context;
-
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
-            {
-                var dummyBytes = new byte[1];
-
-                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-                using (Py.GIL())
-                {
-                    dynamic spacy = Py.Import("spacy");
-                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
-                    PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
-
-                    var pyBytes = ToPython.GetBytes(bytes);
-                    PyDoc.from_bytes(pyBytes);
-                    _vocab = new Vocab(PyDoc.vocab);
-                }
-            }
-
-            Debug.Assert(SerializationMode != SerializationMode.Spacy);
-
-            _text = info.GetString("Text");
-
-            var tempVocab = new Vocab();
-            _vocab = (Vocab)info.GetValue("Vocab", tempVocab.GetType());
-
-            var tempTokens = new List<Token>();
-            _tokens = (List<Token>)info.GetValue("Tokens", tempTokens.GetType());
-
-            var tempSpan = new List<Span>();
-            _sentences = (List<Span>)info.GetValue("Sentences", tempSpan.GetType());
-            _nounChunks = (List<Span>)info.GetValue("NounChunks", tempSpan.GetType());
-            _ents = (List<Span>)info.GetValue("Ents", tempSpan.GetType());
         }
 
         public Doc(Vocab vocab)
@@ -75,6 +37,12 @@ namespace SpacyDotNet
             }
         }
 
+        internal Doc(dynamic doc)
+        {
+            PyDoc = doc;
+            _vocab = null;
+        }
+
         internal Doc(dynamic doc, string text)
         {
             PyDoc = doc;
@@ -83,8 +51,6 @@ namespace SpacyDotNet
         }
 
         internal dynamic PyDoc { get; set; }
-
-        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
 
         public string Text
         {
@@ -144,7 +110,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string path)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -155,15 +121,14 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(path, FileMode.Create);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
+                var formatter = new XmlSerializer(typeof(Doc));
                 formatter.Serialize(stream, this);
             }
         }
 
         public void FromDisk(string path)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -174,8 +139,7 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
+                var formatter = new XmlSerializer(typeof(Doc));                
                 var doc = (Doc)formatter.Deserialize(stream);
                 Copy(doc);
             }
@@ -183,7 +147,7 @@ namespace SpacyDotNet
 
         public byte[] ToBytes()
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -193,8 +157,7 @@ namespace SpacyDotNet
             else
             {
                 var stream = new MemoryStream();
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
+                var formatter = new XmlSerializer(typeof(Doc));
                 formatter.Serialize(stream, this);
                 return stream.ToArray();
             }
@@ -202,7 +165,7 @@ namespace SpacyDotNet
 
         public void FromBytes(byte[] bytes)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -213,35 +176,10 @@ namespace SpacyDotNet
             else
             {
                 var stream = new MemoryStream(bytes);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
+                var formatter = new XmlSerializer(typeof(Doc));
                 var doc = (Doc)formatter.Deserialize(stream);
                 Copy(doc);
             }
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            var serializationMode = (SerializationMode)context.Context;
-
-            if (serializationMode == SerializationMode.SpacyAndDotNet)
-            {
-                using (Py.GIL())
-                {
-                    var pyObj = Interop.GetBytes(PyDoc.to_bytes());
-                    info.AddValue("PyObj", pyObj);
-                }
-            }
-
-            Debug.Assert(serializationMode != SerializationMode.Spacy);
-
-            // Using the property is important form the members to be loaded
-            info.AddValue("Text", Text);
-            info.AddValue("Vocab", Vocab);
-            info.AddValue("Tokens", Tokens);
-            info.AddValue("Sentences", Sents);
-            info.AddValue("NounChunks", NounChunks);
-            info.AddValue("Ents", Ents);
         }
 
         private void Copy(Doc doc)
@@ -257,6 +195,189 @@ namespace SpacyDotNet
             _sentences = doc._sentences;
             _nounChunks = doc._nounChunks;
             _ents = doc._ents;                
+        }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            var serializationMode = Serialization.Selected;
+
+            Debug.Assert(reader.Name == "Doc");
+            reader.ReadStartElement();
+
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
+            {
+                var dummyBytes = new byte[1];
+
+                Debug.Assert(reader.Name == "PyObj");
+                var bytesB64 = reader.ReadElementContentAsString();
+                var bytes = Convert.FromBase64String(bytesB64);
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    dynamic pyVocab = spacy.vocab.Vocab.__call__();
+                    PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    PyDoc.from_bytes(pyBytes);
+                    _vocab = new Vocab(PyDoc.vocab);
+                }
+            }
+
+            Debug.Assert(Serialization.Selected != Serialization.Mode.Spacy);
+
+            Debug.Assert(reader.Name == "Text");
+            _text = reader.ReadElementContentAsString();
+
+            Debug.Assert(reader.Name == "Vocab");
+            _vocab = new Vocab(null);
+            _vocab.ReadXml(reader);
+
+            Debug.Assert(reader.Name == "Tokens");
+            _tokens = new List<Token>();
+            reader.ReadStartElement();
+
+            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            {
+                Debug.Assert(reader.Name == "Token");
+                reader.ReadStartElement();
+                if (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var token = new Token();
+                    token.ReadXml(reader);
+                    _tokens.Add(token);
+                    reader.ReadEndElement();
+                }
+            }
+
+            reader.ReadEndElement();
+
+            foreach (var token in _tokens)
+                token.RestoreHead(_tokens);
+
+            Debug.Assert(reader.Name == "Sentences");
+            _sentences = new List<Span>();
+            reader.ReadStartElement();
+
+            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            {
+                Debug.Assert(reader.Name == "Sent");
+                reader.ReadStartElement();
+                if (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var sent = new Span();
+                    sent.ReadXml(reader);
+                    _sentences.Add(sent);
+                    reader.ReadEndElement();
+                }
+            }
+
+            reader.ReadEndElement();
+
+            Debug.Assert(reader.Name == "NounChunks");
+            _nounChunks = new List<Span>();
+            reader.ReadStartElement();
+
+            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            {
+                Debug.Assert(reader.Name == "NounChunk");
+                reader.ReadStartElement();
+                if (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var nChunk = new Span();
+                    nChunk.ReadXml(reader);
+                    _nounChunks.Add(nChunk);
+                    reader.ReadEndElement();
+                }
+            }
+
+            reader.ReadEndElement();
+
+            Debug.Assert(reader.Name == "Ents");
+            _ents = new List<Span>();
+            reader.ReadStartElement();
+
+            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            {
+                Debug.Assert(reader.Name == "Ent");
+                reader.ReadStartElement();
+                if (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var ent = new Span();
+                    ent.ReadXml(reader);
+                    _ents.Add(ent);
+                    reader.ReadEndElement();
+                }
+            }
+
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            var serializationMode = Serialization.Selected;
+
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
+            {
+                using (Py.GIL())
+                {
+                    var pyObj = Interop.GetBytes(PyDoc.to_bytes());
+                    var pyObjB64 = Convert.ToBase64String(pyObj);
+                    writer.WriteElementString("PyObj", pyObjB64);
+                }
+            }
+
+            Debug.Assert(serializationMode != Serialization.Mode.Spacy);
+
+            // Using the property is important form the members to be loaded
+            writer.WriteElementString("Text", Text);
+            writer.WriteStartElement("Vocab");
+            Vocab.WriteXml(writer);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Tokens");
+            foreach (var token in Tokens)
+            {
+                writer.WriteStartElement("Token");
+                token.WriteXml(writer);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Sentences");
+            foreach (var sent in Sents)
+            {
+                writer.WriteStartElement("Sent");
+                sent.WriteXml(writer);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("NounChunks");
+            foreach (var nounChunk in NounChunks)
+            {
+                writer.WriteStartElement("NounChunk");
+                nounChunk.WriteXml(writer);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Ents");
+            foreach (var ent in Ents)
+            {
+                writer.WriteStartElement("Ent");
+                ent.WriteXml(writer);
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
         }
     }
 }

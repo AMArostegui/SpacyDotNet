@@ -1,12 +1,14 @@
-﻿using Python.Runtime;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class Lexeme : ISerializable
+    public class Lexeme : IXmlSerializable
     {
         private dynamic _pyLexeme;
 
@@ -24,33 +26,6 @@ namespace SpacyDotNet
 
         public Lexeme()
         {
-            // Needed to implement ISerializable
-        }
-
-        protected Lexeme(SerializationInfo info, StreamingContext context)
-        {
-            var dummyBytes = new byte[1];
-
-            var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-            using (Py.GIL())
-            {
-                var pyBytes = ToPython.GetBytes(bytes);
-                _pyLexeme.from_bytes(pyBytes);
-            }
-
-            _text = info.GetString("Text");
-            _shape = info.GetString("Shape");
-            _prefix = info.GetString("Prefix");
-            _suffix = info.GetString("Suffix");
-            _lang = info.GetString("Lang");
-
-            var tempBI = new BigInteger();
-            _orth = (BigInteger)info.GetValue("Orth", tempBI.GetType());
-
-            var tempBool = false;
-            _isAlpha = (bool)info.GetValue("IsAlpha", tempBool.GetType());
-            _isDigit = (bool)info.GetValue("IsDigit", tempBool.GetType());
-            _isTitle = (bool)info.GetValue("IsTitle", tempBool.GetType());
         }
 
         internal Lexeme(dynamic lexeme)
@@ -140,26 +115,73 @@ namespace SpacyDotNet
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            // TODO: ¿Este no distingue el tipo de serialización?
+            Debug.Assert(reader.Name == "PyObj");
+            var bytesB64 = reader.ReadElementContentAsString();
+            var bytes = Convert.FromBase64String(bytesB64);
+
+            using (Py.GIL())
+            {
+                var pyBytes = ToPython.GetBytes(bytes);
+                _pyLexeme.from_bytes(pyBytes);
+            }
+
+            Debug.Assert(reader.Name == "Text");
+            _text = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Shape");
+            _shape = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Prefix");
+            _prefix = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Suffix");
+            _suffix = reader.ReadElementContentAsString();
+            Debug.Assert(reader.Name == "Lang");
+            _lang = reader.ReadElementContentAsString();
+
+            Debug.Assert(reader.Name == "Orth");
+            var orth = reader.ReadElementContentAsString();
+            _orth = BigInteger.Parse(orth);
+
+            Debug.Assert(reader.Name == "IsAlpha");
+            _isAlpha = reader.ReadElementContentAsBoolean();            
+            Debug.Assert(reader.Name == "IsDigit");
+            _isDigit = reader.ReadElementContentAsBoolean();
+            Debug.Assert(reader.Name == "IsTitle");
+            _isTitle = reader.ReadElementContentAsBoolean();
+        }
+
+        public void WriteXml(XmlWriter writer)
         {
             using (Py.GIL())
             {
                 var pyObj = Interop.GetBytes(_pyLexeme.to_bytes());
-                info.AddValue("PyObj", pyObj);
+                writer.WriteElementString("PyObj", pyObj);
             }
 
             // Using the property is important form the members to be loaded
-            info.AddValue("Text", Text);
-            info.AddValue("Shape", Shape);
-            info.AddValue("Prefix", Prefix);
-            info.AddValue("Suffix", Suffix);
-            info.AddValue("Lang", Lang);
+            writer.WriteElementString("Text", Text);
+            writer.WriteElementString("Shape", Shape);
+            writer.WriteElementString("Prefix", Prefix);
+            writer.WriteElementString("Suffix", Suffix);
+            writer.WriteElementString("Lang", Lang);
 
-            info.AddValue("Orth", Orth);
+            writer.WriteElementString("Orth", Orth.ToString());
 
-            info.AddValue("IsAlpha", IsAlpha);
-            info.AddValue("IsDigit", IsDigit);
-            info.AddValue("IsTitle", IsTitle);
+            writer.WriteStartElement("IsAlpha");
+            writer.WriteValue(IsAlpha);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsDigit");
+            writer.WriteValue(IsDigit);
+            writer.WriteEndElement();
+            writer.WriteStartElement("IsTitle");
+            writer.WriteValue(IsTitle);
+            writer.WriteEndElement();
         }
     }
 }

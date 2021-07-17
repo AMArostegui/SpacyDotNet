@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    [Serializable]
-    public class DocBin : ISerializable
+    public class DocBin : IXmlSerializable
     {
         private dynamic _pyDocBin;
         private List<Doc> _docs;
@@ -43,33 +43,6 @@ namespace SpacyDotNet
             }
         }
 
-        protected DocBin(SerializationInfo info, StreamingContext context)
-        {
-            SerializationMode = (SerializationMode)context.Context;
-
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
-            {
-                var dummyBytes = new byte[1];
-
-                var bytes = (byte[])info.GetValue("PyObj", dummyBytes.GetType());
-                using (Py.GIL())
-                {
-                    dynamic spacy = Py.Import("spacy");
-                    _pyDocBin = spacy.tokens.DocBin.__call__();
-
-                    var pyBytes = ToPython.GetBytes(bytes);
-                    _pyDocBin.from_bytes(pyBytes);
-                }
-            }
-
-            Debug.Assert(SerializationMode != SerializationMode.Spacy);
-
-            var tempDocs = new List<Doc>();
-            _docs = (List<Doc>)info.GetValue("Docs", tempDocs.GetType());
-        }
-
-        public SerializationMode SerializationMode { get; set; } = SerializationMode.Spacy;
-
         public void Add(Doc doc)
         {
             if (_docs == null)
@@ -86,7 +59,7 @@ namespace SpacyDotNet
 
         public byte[] ToBytes()
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -96,8 +69,7 @@ namespace SpacyDotNet
             else
             {                
                 var stream = new MemoryStream();
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
+                var formatter = new XmlSerializer(typeof(DocBin));                
                 formatter.Serialize(stream, this);
                 return stream.ToArray();
             }
@@ -105,7 +77,7 @@ namespace SpacyDotNet
 
         public void FromBytes(byte[] bytes)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -116,8 +88,7 @@ namespace SpacyDotNet
             else
             {                
                 var stream = new MemoryStream(bytes);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
+                var formatter = new XmlSerializer(typeof(DocBin));
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -125,7 +96,7 @@ namespace SpacyDotNet
 
         public void ToDisk(string pathFile)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -136,15 +107,14 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(pathFile, FileMode.Create);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);                
+                var formatter = new XmlSerializer(typeof(DocBin));
                 formatter.Serialize(stream, this);
             }
         }
 
         public void FromDisk(string pathFile)
         {
-            if (SerializationMode == SerializationMode.Spacy)
+            if (Serialization.Selected == Serialization.Mode.Spacy)
             {
                 using (Py.GIL())
                 {
@@ -155,8 +125,7 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(pathFile, FileMode.Open, FileAccess.Read);
-                var formatter = new BinaryFormatter();
-                formatter.Context = new StreamingContext(StreamingContextStates.All, SerializationMode);
+                var formatter = new XmlSerializer(typeof(DocBin));
                 var docBin = (DocBin)formatter.Deserialize(stream);
                 Copy(docBin);
             }
@@ -165,24 +134,6 @@ namespace SpacyDotNet
         public List<Doc> GetDocs(Vocab vocab)
         {
             return Interop.GetListFromGenerator(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            var serializationMode = (SerializationMode)context.Context;
-
-            if (serializationMode == SerializationMode.SpacyAndDotNet)
-            {
-                using (Py.GIL())
-                {
-                    var pyObj = Interop.GetBytes(_pyDocBin.to_bytes());
-                    info.AddValue("PyObj", pyObj);
-                }
-            }
-
-            Debug.Assert(serializationMode != SerializationMode.Spacy);
-
-            info.AddValue("Docs", _docs);
         }
 
         private void Copy(DocBin docBin)
@@ -194,7 +145,7 @@ namespace SpacyDotNet
             // disregarding its current value which might be a default object
             _pyDocBin = docBin._pyDocBin;
 
-            if (SerializationMode == SerializationMode.SpacyAndDotNet)
+            if (Serialization.Selected == Serialization.Mode.SpacyAndDotNet)
             {
                 using (Py.GIL())
                 {
@@ -217,6 +168,80 @@ namespace SpacyDotNet
                     }
                 }
             }
+        }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            var serializationMode = Serialization.Selected;
+
+            reader.ReadStartElement();
+
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
+            {
+                Debug.Assert(reader.Name == "PyObj");
+                var bytesB64 = reader.ReadElementContentAsString();
+                var bytes = Convert.FromBase64String(bytesB64);
+
+                using (Py.GIL())
+                {
+                    dynamic spacy = Py.Import("spacy");
+                    _pyDocBin = spacy.tokens.DocBin.__call__();
+
+                    var pyBytes = ToPython.GetBytes(bytes);
+                    _pyDocBin.from_bytes(pyBytes);
+                }
+            }
+
+            Debug.Assert(serializationMode != Serialization.Mode.Spacy);
+
+            Debug.Assert(reader.Name == "Docs");
+            reader.ReadStartElement();
+            _docs = new List<Doc>();            
+
+            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            {                
+                if (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var doc = new Doc();
+                    doc.ReadXml(reader);
+                    _docs.Add(doc);
+                }
+            }
+
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            var serializationMode = Serialization.Selected;
+
+            if (serializationMode == Serialization.Mode.SpacyAndDotNet)
+            {
+                using (Py.GIL())
+                {
+                    var pyObj = Interop.GetBytes(_pyDocBin.to_bytes());
+                    var pyObjB64 = Convert.ToBase64String(pyObj);
+                    writer.WriteElementString("PyObj", pyObjB64);
+                }
+            }
+
+            Debug.Assert(serializationMode != Serialization.Mode.Spacy);
+
+            writer.WriteStartElement("Docs");
+
+            foreach (var doc in _docs)
+            {
+                writer.WriteStartElement("Doc");
+                doc.WriteXml(writer);
+                writer.WriteEndElement();
+            }                
+
+            writer.WriteEndElement();
         }
     }
 }
