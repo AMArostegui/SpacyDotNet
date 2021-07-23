@@ -215,7 +215,7 @@ namespace SpacyDotNet
         {
             get
             {
-                return Interop.GetListFromCollection(_pyToken?.children, ref _children);
+                return Interop.GetListFromGenerator(_pyToken?.children, ref _children);
             }
         }
 
