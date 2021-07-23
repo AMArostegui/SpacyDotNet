@@ -78,7 +78,7 @@ namespace SpacyDotNet
             var pipeNames = reader.ReadElementContentAsString();
             _pipeNames = pipeNames.Split(',').ToList();
 
-            // TODO: ¿Esto qué?
+            // TODO: Yet to debug. It's not being used so far
             _meta = new PipelineMeta(this);
         }
 

@@ -122,7 +122,7 @@ namespace SpacyDotNet
 
         public void ReadXml(XmlReader reader)
         {
-            // TODO: ¿Este no distingue el tipo de serialización?
+            // TODO: Yet to debug. It's not being used so far
             Debug.Assert(reader.Name == "PyObj");
             var bytesB64 = reader.ReadElementContentAsString();
             var bytes = Convert.FromBase64String(bytesB64);
