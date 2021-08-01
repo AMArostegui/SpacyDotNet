@@ -211,8 +211,6 @@ namespace SpacyDotNet
 
             if (serializationMode == Serialization.Mode.SpacyAndDotNet)
             {
-                var dummyBytes = new byte[1];
-
                 Debug.Assert(reader.Name == "PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
@@ -280,22 +278,26 @@ namespace SpacyDotNet
 
             Debug.Assert(reader.Name == "NounChunks");
             _nounChunks = new List<Span>();
+            var isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
 
-            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            if (!isEmpty)
             {
-                Debug.Assert(reader.Name == "NounChunk");
-                reader.ReadStartElement();
-                if (reader.NodeType != XmlNodeType.EndElement)
+                while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    var nChunk = new Span();
-                    nChunk.ReadXml(reader);
-                    _nounChunks.Add(nChunk);
-                    reader.ReadEndElement();
+                    Debug.Assert(reader.Name == "NounChunk");
+                    reader.ReadStartElement();
+                    if (reader.NodeType != XmlNodeType.EndElement)
+                    {
+                        var nChunk = new Span();
+                        nChunk.ReadXml(reader);
+                        _nounChunks.Add(nChunk);
+                        reader.ReadEndElement();
+                    }
                 }
-            }
 
-            reader.ReadEndElement();
+                reader.ReadEndElement();
+            }
 
             Debug.Assert(reader.Name == "Ents");
             _ents = new List<Span>();
