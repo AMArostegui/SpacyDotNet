@@ -237,48 +237,56 @@ namespace SpacyDotNet
 
             Debug.Assert(reader.Name == "Tokens");
             _tokens = new List<Token>();
+            var isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
 
-            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            if (!isEmpty)
             {
-                Debug.Assert(reader.Name == "Token");
-                reader.ReadStartElement();
-                if (reader.NodeType != XmlNodeType.EndElement)
+                while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    var token = new Token();
-                    token.ReadXml(reader);
-                    _tokens.Add(token);
-                    reader.ReadEndElement();
+                    Debug.Assert(reader.Name == "Token");
+                    reader.ReadStartElement();
+                    if (reader.NodeType != XmlNodeType.EndElement)
+                    {
+                        var token = new Token();
+                        token.ReadXml(reader);
+                        _tokens.Add(token);
+                        reader.ReadEndElement();
+                    }
                 }
-            }
 
-            reader.ReadEndElement();
+                reader.ReadEndElement();
+            }
 
             foreach (var token in _tokens)
                 token.RestoreHead(_tokens);
 
             Debug.Assert(reader.Name == "Sentences");
             _sentences = new List<Span>();
+            isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
 
-            while (reader.MoveToContent() != XmlNodeType.EndElement)
+            if (!isEmpty)
             {
-                Debug.Assert(reader.Name == "Sent");
-                reader.ReadStartElement();
-                if (reader.NodeType != XmlNodeType.EndElement)
+                while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    var sent = new Span();
-                    sent.ReadXml(reader);
-                    _sentences.Add(sent);
-                    reader.ReadEndElement();
+                    Debug.Assert(reader.Name == "Sent");
+                    reader.ReadStartElement();
+                    if (reader.NodeType != XmlNodeType.EndElement)
+                    {
+                        var sent = new Span();
+                        sent.ReadXml(reader);
+                        _sentences.Add(sent);
+                        reader.ReadEndElement();
+                    }
                 }
-            }
 
-            reader.ReadEndElement();
+                reader.ReadEndElement();
+            }
 
             Debug.Assert(reader.Name == "NounChunks");
             _nounChunks = new List<Span>();
-            var isEmpty = reader.IsEmptyElement;
+            isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
 
             if (!isEmpty)
