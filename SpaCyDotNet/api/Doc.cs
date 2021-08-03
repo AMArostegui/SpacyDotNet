@@ -121,8 +121,12 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(path, FileMode.Create);
-                var formatter = new XmlSerializer(typeof(Doc));
-                formatter.Serialize(stream, this);
+
+                var settings = new XmlWriterSettings();
+                settings.Indent = true;
+                using var writer = XmlWriter.Create(stream, settings);
+
+                WriteXml(writer);
             }
         }
 
@@ -139,8 +143,14 @@ namespace SpacyDotNet
             else
             {
                 using var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                var formatter = new XmlSerializer(typeof(Doc));                
-                var doc = (Doc)formatter.Deserialize(stream);
+
+                var settings = new XmlReaderSettings();
+                settings.IgnoreComments = true;
+                settings.IgnoreWhitespace = true;
+                var reader = XmlReader.Create(stream, settings);
+
+                var doc = new Doc();
+                doc.ReadXml(reader);
                 Copy(doc);
             }
         }
@@ -156,9 +166,14 @@ namespace SpacyDotNet
             }
             else
             {
-                var stream = new MemoryStream();
-                var formatter = new XmlSerializer(typeof(Doc));
-                formatter.Serialize(stream, this);
+                using var stream = new MemoryStream();
+
+                var settings = new XmlWriterSettings();
+                settings.Indent = true;
+                using var writer = XmlWriter.Create(stream, settings);                
+
+                WriteXml(writer);
+                writer.Flush();
                 return stream.ToArray();
             }
         }
@@ -176,8 +191,14 @@ namespace SpacyDotNet
             else
             {
                 var stream = new MemoryStream(bytes);
-                var formatter = new XmlSerializer(typeof(Doc));
-                var doc = (Doc)formatter.Deserialize(stream);
+
+                var settings = new XmlReaderSettings();
+                settings.IgnoreComments = true;
+                settings.IgnoreWhitespace = true;
+                var reader = XmlReader.Create(stream, settings);
+
+                var doc = new Doc();
+                doc.ReadXml(reader);
                 Copy(doc);
             }
         }
@@ -205,13 +226,14 @@ namespace SpacyDotNet
         public void ReadXml(XmlReader reader)
         {
             var serializationMode = Serialization.Selected;
+            reader.MoveToContent();
 
-            Debug.Assert(reader.Name == "Doc");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Doc");
             reader.ReadStartElement();
 
             if (serializationMode == Serialization.Mode.SpacyAndDotNet)
             {
-                Debug.Assert(reader.Name == "PyObj");
+                Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
                 using (Py.GIL())
@@ -228,14 +250,14 @@ namespace SpacyDotNet
 
             Debug.Assert(Serialization.Selected != Serialization.Mode.Spacy);
 
-            Debug.Assert(reader.Name == "Text");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Text");
             _text = reader.ReadElementContentAsString();
 
-            Debug.Assert(reader.Name == "Vocab");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Vocab");
             _vocab = new Vocab(null);
             _vocab.ReadXml(reader);
 
-            Debug.Assert(reader.Name == "Tokens");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Tokens");
             _tokens = new List<Token>();
             var isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
@@ -244,7 +266,7 @@ namespace SpacyDotNet
             {
                 while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    Debug.Assert(reader.Name == "Token");
+                    Debug.Assert(reader.Name == $"{Serialization.Prefix}:Token");
                     reader.ReadStartElement();
                     if (reader.NodeType != XmlNodeType.EndElement)
                     {
@@ -261,7 +283,7 @@ namespace SpacyDotNet
             foreach (var token in _tokens)
                 token.RestoreHead(_tokens);
 
-            Debug.Assert(reader.Name == "Sentences");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Sentences");
             _sentences = new List<Span>();
             isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
@@ -270,7 +292,7 @@ namespace SpacyDotNet
             {
                 while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    Debug.Assert(reader.Name == "Sent");
+                    Debug.Assert(reader.Name == $"{Serialization.Prefix}:Sent");
                     reader.ReadStartElement();
                     if (reader.NodeType != XmlNodeType.EndElement)
                     {
@@ -284,7 +306,7 @@ namespace SpacyDotNet
                 reader.ReadEndElement();
             }
 
-            Debug.Assert(reader.Name == "NounChunks");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:NounChunks");
             _nounChunks = new List<Span>();
             isEmpty = reader.IsEmptyElement;
             reader.ReadStartElement();
@@ -293,7 +315,7 @@ namespace SpacyDotNet
             {
                 while (reader.MoveToContent() != XmlNodeType.EndElement)
                 {
-                    Debug.Assert(reader.Name == "NounChunk");
+                    Debug.Assert(reader.Name == $"{Serialization.Prefix}:NounChunk");
                     reader.ReadStartElement();
                     if (reader.NodeType != XmlNodeType.EndElement)
                     {
@@ -307,13 +329,13 @@ namespace SpacyDotNet
                 reader.ReadEndElement();
             }
 
-            Debug.Assert(reader.Name == "Ents");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Ents");
             _ents = new List<Span>();
             reader.ReadStartElement();
 
             while (reader.MoveToContent() != XmlNodeType.EndElement)
             {
-                Debug.Assert(reader.Name == "Ent");
+                Debug.Assert(reader.Name == $"{Serialization.Prefix}:Ent");
                 reader.ReadStartElement();
                 if (reader.NodeType != XmlNodeType.EndElement)
                 {
@@ -329,6 +351,8 @@ namespace SpacyDotNet
 
         public void WriteXml(XmlWriter writer)
         {
+            writer.WriteStartElement(Serialization.Prefix, "Doc", Serialization.Namespace);
+
             var serializationMode = Serialization.Selected;
 
             if (serializationMode == Serialization.Mode.SpacyAndDotNet)
@@ -337,55 +361,57 @@ namespace SpacyDotNet
                 {
                     var pyObj = Interop.GetBytes(PyDoc.to_bytes());
                     var pyObjB64 = Convert.ToBase64String(pyObj);
-                    writer.WriteElementString("PyObj", pyObjB64);
+                    writer.WriteElementString("PyObj", Serialization.Namespace, pyObjB64);
                 }
             }
 
             Debug.Assert(serializationMode != Serialization.Mode.Spacy);
 
             // Using the property is important form the members to be loaded
-            writer.WriteElementString("Text", Text);
-            writer.WriteStartElement("Vocab");
+            writer.WriteElementString("Text", Serialization.Namespace, Text);
+            writer.WriteStartElement("Vocab", Serialization.Namespace);
             Vocab.WriteXml(writer);
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Tokens");
+            writer.WriteStartElement("Tokens", Serialization.Namespace);
             foreach (var token in Tokens)
             {
-                writer.WriteStartElement("Token");
+                writer.WriteStartElement("Token", Serialization.Namespace);
                 token.WriteXml(writer);
                 writer.WriteEndElement();
             }
 
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Sentences");
+            writer.WriteStartElement("Sentences", Serialization.Namespace);
             foreach (var sent in Sents)
             {
-                writer.WriteStartElement("Sent");
+                writer.WriteStartElement("Sent", Serialization.Namespace);
                 sent.WriteXml(writer);
                 writer.WriteEndElement();
             }
 
             writer.WriteEndElement();
 
-            writer.WriteStartElement("NounChunks");
+            writer.WriteStartElement("NounChunks", Serialization.Namespace);
             foreach (var nounChunk in NounChunks)
             {
-                writer.WriteStartElement("NounChunk");
+                writer.WriteStartElement("NounChunk", Serialization.Namespace);
                 nounChunk.WriteXml(writer);
                 writer.WriteEndElement();
             }
 
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Ents");
+            writer.WriteStartElement("Ents", Serialization.Namespace);
             foreach (var ent in Ents)
             {
-                writer.WriteStartElement("Ent");
+                writer.WriteStartElement("Ent", Serialization.Namespace);
                 ent.WriteXml(writer);
                 writer.WriteEndElement();
             }
+
+            writer.WriteEndElement();
 
             writer.WriteEndElement();
         }

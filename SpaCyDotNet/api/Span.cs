@@ -65,26 +65,26 @@ namespace SpacyDotNet
 
         public void ReadXml(XmlReader reader)
         {
-            Debug.Assert(reader.Name == "Text");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Text");
             _text = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Label");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Label");
             _label = reader.ReadElementContentAsString();
 
-            Debug.Assert(reader.Name == "StartChar");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:StartChar");
             _startChar = reader.ReadElementContentAsInt();
-            Debug.Assert(reader.Name == "EndChar");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:EndChar");
             _endChar = reader.ReadElementContentAsInt();
         }
 
         public void WriteXml(XmlWriter writer)
         {
             // Using the property is important form the members to be loaded
-            writer.WriteElementString("Text", Text);
-            writer.WriteElementString("Label", Label);
-            writer.WriteStartElement("StartChar");
+            writer.WriteElementString("Text", Serialization.Namespace, Text);
+            writer.WriteElementString("Label", Serialization.Namespace, Label);
+            writer.WriteStartElement("StartChar", Serialization.Namespace);
             writer.WriteValue(StartChar);
             writer.WriteEndElement();
-            writer.WriteStartElement("EndChar");
+            writer.WriteStartElement("EndChar", Serialization.Namespace);
             writer.WriteValue(EndChar);
             writer.WriteEndElement();
         }

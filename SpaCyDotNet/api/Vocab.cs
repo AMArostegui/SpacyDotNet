@@ -137,7 +137,7 @@ namespace SpacyDotNet
             if (serializationMode == Serialization.Mode.SpacyAndDotNet)
             {
                 reader.ReadStartElement();
-                Debug.Assert(reader.Name == "PyObj");
+                Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
                 using (Py.GIL())
@@ -169,7 +169,7 @@ namespace SpacyDotNet
                 {
                     var pyObj = Interop.GetBytes(PyVocab.to_bytes());
                     var pyObjB64 = Convert.ToBase64String(pyObj);
-                    writer.WriteElementString("PyObj", pyObjB64);
+                    writer.WriteElementString("PyObj", Serialization.Namespace, pyObjB64);
                 }
             }
         }

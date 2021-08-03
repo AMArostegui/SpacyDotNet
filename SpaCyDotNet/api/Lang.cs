@@ -65,7 +65,7 @@ namespace SpacyDotNet
         {
             var dummyBytes = new byte[1];
 
-            Debug.Assert(reader.Name == "PyObj");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
             var bytesB64 = reader.ReadElementContentAsString();
             var bytes = Convert.FromBase64String(bytesB64);
             using (Py.GIL())
@@ -74,7 +74,7 @@ namespace SpacyDotNet
                 _pyLang.from_bytes(pyBytes);
             }
 
-            Debug.Assert(reader.Name == "PipeNames");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:PipeNames");
             var pipeNames = reader.ReadElementContentAsString();
             _pipeNames = pipeNames.Split(',').ToList();
 
@@ -88,11 +88,11 @@ namespace SpacyDotNet
             {
                 var pyObj = Interop.GetBytes(_pyLang.to_bytes());
                 var pyObjB64 = Convert.ToBase64String(pyObj);
-                writer.WriteElementString("PyObj", pyObjB64);
+                writer.WriteElementString("PyObj", pyObjB64, Serialization.Namespace);
             }
 
             // Using the property is important form the members to be loaded
-            writer.WriteElementString("PipeNames", string.Join(',', PipeNames));
+            writer.WriteElementString("PipeNames", string.Join(',', PipeNames), Serialization.Namespace);
         }
 
         public class PipelineMeta : Dictionary<string, object>

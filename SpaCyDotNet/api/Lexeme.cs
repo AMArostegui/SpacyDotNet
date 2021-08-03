@@ -123,7 +123,7 @@ namespace SpacyDotNet
         public void ReadXml(XmlReader reader)
         {
             // TODO: Yet to debug. It's not being used so far
-            Debug.Assert(reader.Name == "PyObj");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
             var bytesB64 = reader.ReadElementContentAsString();
             var bytes = Convert.FromBase64String(bytesB64);
 
@@ -133,26 +133,26 @@ namespace SpacyDotNet
                 _pyLexeme.from_bytes(pyBytes);
             }
 
-            Debug.Assert(reader.Name == "Text");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Text");
             _text = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Shape");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Shape");
             _shape = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Prefix");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Prefix");
             _prefix = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Suffix");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Suffix");
             _suffix = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Lang");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Lang");
             _lang = reader.ReadElementContentAsString();
 
-            Debug.Assert(reader.Name == "Orth");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Orth");
             var orth = reader.ReadElementContentAsString();
             _orth = BigInteger.Parse(orth);
 
-            Debug.Assert(reader.Name == "IsAlpha");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsAlpha");
             _isAlpha = reader.ReadElementContentAsBoolean();            
-            Debug.Assert(reader.Name == "IsDigit");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsDigit");
             _isDigit = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "IsTitle");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsTitle");
             _isTitle = reader.ReadElementContentAsBoolean();
         }
 
@@ -161,25 +161,25 @@ namespace SpacyDotNet
             using (Py.GIL())
             {
                 var pyObj = Interop.GetBytes(_pyLexeme.to_bytes());
-                writer.WriteElementString("PyObj", pyObj);
+                writer.WriteElementString("PyObj", pyObj, Serialization.Namespace);
             }
 
             // Using the property is important form the members to be loaded
-            writer.WriteElementString("Text", Text);
-            writer.WriteElementString("Shape", Shape);
-            writer.WriteElementString("Prefix", Prefix);
-            writer.WriteElementString("Suffix", Suffix);
-            writer.WriteElementString("Lang", Lang);
+            writer.WriteElementString("Text", Text, Serialization.Namespace);
+            writer.WriteElementString("Shape", Shape, Serialization.Namespace);
+            writer.WriteElementString("Prefix", Prefix, Serialization.Namespace);
+            writer.WriteElementString("Suffix", Suffix, Serialization.Namespace);
+            writer.WriteElementString("Lang", Lang, Serialization.Namespace);
 
-            writer.WriteElementString("Orth", Orth.ToString());
+            writer.WriteElementString("Orth", Orth.ToString(), Serialization.Namespace);
 
-            writer.WriteStartElement("IsAlpha");
+            writer.WriteStartElement("IsAlpha", Serialization.Namespace);
             writer.WriteValue(IsAlpha);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsDigit");
+            writer.WriteStartElement("IsDigit", Serialization.Namespace);
             writer.WriteValue(IsDigit);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsTitle");
+            writer.WriteStartElement("IsTitle", Serialization.Namespace);
             writer.WriteValue(IsTitle);
             writer.WriteEndElement();
         }

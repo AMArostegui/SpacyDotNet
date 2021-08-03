@@ -241,44 +241,44 @@ namespace SpacyDotNet
 
         public void ReadXml(XmlReader reader)
         {
-            Debug.Assert(reader.Name == "Text");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Text");
             _text = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Lemma");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Lemma");
             _lemma = reader.ReadElementContentAsString();
 
-            Debug.Assert(reader.Name == "Pos");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Pos");
             _pos = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Tag");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Tag");
             _tag = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Dep");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Dep");
             _dep = reader.ReadElementContentAsString();
-            Debug.Assert(reader.Name == "Shape");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Shape");
             _shape = reader.ReadElementContentAsString();
 
-            Debug.Assert(reader.Name == "IsAlpha");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsAlpha");
             _isAlpha = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "IsStop");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsStop");
             _isStop = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "IsPunct");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsPunct");
             _isPunct = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "IsDigit");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsDigit");
             _isDigit = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "LikeNum");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:LikeNum");
             _likeNum = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "LikeEMail");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:LikeEMail");
             _likeEMail = reader.ReadElementContentAsBoolean();
 
-            Debug.Assert(reader.Name == "HasVector");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:HasVector");
             _hasVector = reader.ReadElementContentAsBoolean();
-            Debug.Assert(reader.Name == "VectorNorm");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:VectorNorm");
             _vectorNorm = reader.ReadElementContentAsDouble();
-            Debug.Assert(reader.Name == "IsOov");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:IsOov");
             _isOov = reader.ReadElementContentAsBoolean();
 
-            Debug.Assert(reader.Name == "I");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:I");
             _i = reader.ReadElementContentAsInt();
 
-            Debug.Assert(reader.Name == "Head");
+            Debug.Assert(reader.Name == $"{Serialization.Prefix}:Head");
             var headPosStr = reader.GetAttribute("Pos");
             if (string.IsNullOrEmpty(headPosStr))
                 _headPos = -1;
@@ -291,48 +291,48 @@ namespace SpacyDotNet
         public void WriteXml(XmlWriter writer)
         {
             // Using the property is important form the members to be loaded
-            writer.WriteElementString("Text", Text);
-            writer.WriteElementString("Lemma", Lemma);
+            writer.WriteElementString("Text", Serialization.Namespace, Text);
+            writer.WriteElementString("Lemma", Serialization.Namespace, Lemma);
 
-            writer.WriteElementString("Pos", PoS);
-            writer.WriteElementString("Tag", Tag);
-            writer.WriteElementString("Dep", Dep);
-            writer.WriteElementString("Shape", Shape);
+            writer.WriteElementString("Pos", Serialization.Namespace, PoS);
+            writer.WriteElementString("Tag", Serialization.Namespace, Tag);
+            writer.WriteElementString("Dep", Serialization.Namespace, Dep);
+            writer.WriteElementString("Shape", Serialization.Namespace, Shape);
 
-            writer.WriteStartElement("IsAlpha");
+            writer.WriteStartElement("IsAlpha", Serialization.Namespace);
             writer.WriteValue(IsAlpha);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsStop");
+            writer.WriteStartElement("IsStop", Serialization.Namespace);
             writer.WriteValue(IsStop);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsPunct");
+            writer.WriteStartElement("IsPunct", Serialization.Namespace);
             writer.WriteValue(IsPunct);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsDigit");
+            writer.WriteStartElement("IsDigit", Serialization.Namespace);
             writer.WriteValue(IsDigit);
             writer.WriteEndElement();
-            writer.WriteStartElement("LikeNum");
+            writer.WriteStartElement("LikeNum", Serialization.Namespace);
             writer.WriteValue(LikeNum);
             writer.WriteEndElement();
-            writer.WriteStartElement("LikeEMail");
+            writer.WriteStartElement("LikeEMail", Serialization.Namespace);
             writer.WriteValue(LikeEMail);
             writer.WriteEndElement();
 
-            writer.WriteStartElement("HasVector");
+            writer.WriteStartElement("HasVector", Serialization.Namespace);
             writer.WriteValue(HasVector);
             writer.WriteEndElement();
-            writer.WriteStartElement("VectorNorm");
+            writer.WriteStartElement("VectorNorm", Serialization.Namespace);
             writer.WriteValue(VectorNorm);
             writer.WriteEndElement();
-            writer.WriteStartElement("IsOov");
+            writer.WriteStartElement("IsOov", Serialization.Namespace);
             writer.WriteValue(IsOov);
             writer.WriteEndElement();
 
-            writer.WriteStartElement("I");
+            writer.WriteStartElement("I", Serialization.Namespace);
             writer.WriteValue(I);
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Head");
+            writer.WriteStartElement("Head", Serialization.Namespace);
             var head = Head;
             if (head == this)
                 writer.WriteAttributeString("Pos", string.Empty);
