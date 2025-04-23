@@ -70,7 +70,7 @@ namespace SpacyDotNet
 
             using (Py.GIL())
             {
-                var longPy = new PyLong(dynLongPyObj);
+                var longPy = new PyInt(dynLongPyObj);
                 longMember = longPy.ToInt64();
                 return (long)longMember;
             }
@@ -83,7 +83,7 @@ namespace SpacyDotNet
 
             using (Py.GIL())
             {                
-                var pyLong = new PyLong(dynLongPyObj);
+                var pyLong = new PyInt(dynLongPyObj);
 
                 // This is inefficient, and should be reworked in the future
                 var str = pyLong.ToString();
@@ -174,13 +174,7 @@ namespace SpacyDotNet
             var pyBuff = pyBytes.GetBuffer();
 
             var buff = new byte[pyBuff.Length];
-            var read = pyBuff.Read(buff, 0, (int)pyBuff.Length);
-            if (read != pyBuff.Length)
-            {
-                Debug.Assert(false);
-                return null;
-            }
-
+            pyBuff.Read(buff, 0, (int)pyBuff.Length, 0);
             return buff;
         }
     }

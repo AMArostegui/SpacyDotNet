@@ -33,7 +33,7 @@ namespace SpacyDotNet
                     using (Py.GIL())
                     {
                         var dynPyNumber = _pyStringStore.__getitem__(key);
-                        var pyNumber = new PyLong(dynPyNumber);
+                        var pyNumber = new PyInt(dynPyNumber);
                         valHash = BigInteger.Parse(pyNumber.ToString());
                         _dictStrToNumber.Add(keyStr, valHash);
                     }

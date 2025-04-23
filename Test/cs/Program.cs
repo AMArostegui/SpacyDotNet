@@ -2,6 +2,7 @@
 using SpacyDotNet;
 using CommandLine;
 using System.Collections.Generic;
+using Python.Runtime;
 
 namespace Test
 {
@@ -23,6 +24,8 @@ namespace Test
             //ExampleES.Run();
             //Serialization.Run();
             //DisplaCy.Run();
+
+            PythonEngine.Shutdown();
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

@@ -7,6 +7,8 @@ binPyRt/
 SpaCyDotNet.PyRt.csproj
 Test.PyRt.csproj
 Test.PyRt.sln
+veSpacyDotNet*/
+venv/
 
 # User-specific files
 *.suo

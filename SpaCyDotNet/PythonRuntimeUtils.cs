@@ -23,7 +23,7 @@ namespace SpacyDotNet
         public static void Init(string interpreter, string pathVirtualEnv)
         {
             // SeeCliOptions.Interpreter
-            Runtime.PythonDLL = interpreter;
+            Runtime.PythonDLL = interpreter;            
 
             if (string.IsNullOrEmpty(pathVirtualEnv))
                 throw new Exception("You need to define PathVirtualEnv before using the wrapper");
@@ -54,6 +54,8 @@ namespace SpacyDotNet
 
             Environment.SetEnvironmentVariable("PYTHONPATH", pythonPath, EnvironmentVariableTarget.Process);
             PythonEngine.PythonPath = pythonPath;
+
+            PythonEngine.Initialize();
         }
     }
 }
