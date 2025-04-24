@@ -1,11 +1,17 @@
-﻿namespace SpacyDotNet
-{
-    using Python.Runtime;
+﻿using Python.Runtime;
+using PythonNetUtils;
+using System;
 
+namespace SpacyDotNet
+{
     public class Spacy
     {
         public Spacy()
         {
+            if (!PythonRt.IsInitialized)
+            {
+                throw new InvalidOperationException("Initialize runtime before usage");
+            }
         }
 
         public Lang Load(string model)

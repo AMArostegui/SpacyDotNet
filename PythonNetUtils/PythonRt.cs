@@ -18,6 +18,8 @@ namespace PythonNetUtils
             _initialized = true;
         }
 
+        public static bool IsInitialized => _initialized;
+
         /// <summary>
         /// Python.NET project provides a WIKI to initialize the library using virtual environments. See:
         ///     https://github.com/pythonnet/pythonnet/wiki/Using-Python.NET-with-Virtual-Environments
