@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Python.Runtime;
 using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
-using Python.Runtime;
 
-namespace SpacyDotNet
+namespace PythonNetUtils
 {
     public class Interop
     {

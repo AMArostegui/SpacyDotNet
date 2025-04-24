@@ -1,9 +1,7 @@
 ﻿using Python.Runtime;
-using System;
 using System.Diagnostics;
-using System.IO;
 
-namespace SpacyDotNet
+namespace PythonNetUtils
 {
     public class PythonRt : IDisposable
     {

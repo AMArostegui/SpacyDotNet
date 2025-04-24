@@ -1,7 +1,6 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 
-namespace SpacyDotNet
+namespace PythonNetUtils
 {
     public static class Utils
     {

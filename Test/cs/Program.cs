@@ -1,8 +1,7 @@
-﻿using System;
-using SpacyDotNet;
-using CommandLine;
+﻿using CommandLine;
+using PythonNetUtils;
+using System;
 using System.Collections.Generic;
-using Python.Runtime;
 
 namespace Test
 {
