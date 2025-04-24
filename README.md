@@ -2,8 +2,6 @@
 
 SpacyDotNet is a .NET wrapper for the natural language library [spaCy](https://spacy.io/)
 
-It's a .NET Standard 2.1 library, and I'll likely keep it that way, so it can be consumed by older .NET Framework projects.
-
 ## Project scope and limitations
 
 This project is not meant to be a complete and exhaustive implementation of all spaCy features and [APIs](https://spacy.io/api). Altough it should be enough for basic tasks, think of it as a starting point, if you need to build a complex project using spaCy in .NET 
