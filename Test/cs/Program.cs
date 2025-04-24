@@ -17,15 +17,14 @@ namespace Test
 
         static void RunOptions(CliOptions cliOps)
         {
-            PythonRuntimeUtils.Init(cliOps.Interpreter, cliOps.PathVirtualEnv);
-
-            SpaCy101.Run();
-            //LinguisticFeatures.Run();
-            //ExampleES.Run();
-            //Serialization.Run();
-            //DisplaCy.Run();
-
-            PythonEngine.Shutdown();
+            using (new PythonRt(cliOps.Interpreter, cliOps.PathVirtualEnv))
+            {
+                SpaCy101.Run();
+                //LinguisticFeatures.Run();
+                //ExampleES.Run();
+                //Serialization.Run();
+                //DisplaCy.Run();
+            }
         }
 
         static void HandleParseError(IEnumerable<Error> errs)

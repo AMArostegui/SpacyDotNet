@@ -1,12 +1,25 @@
-﻿using System;
+﻿using Python.Runtime;
+using System;
 using System.Diagnostics;
 using System.IO;
-using Python.Runtime;
 
 namespace SpacyDotNet
 {
-    public static class PythonRuntimeUtils
+    public class PythonRt : IDisposable
     {
+        private static bool _initialized = false;        
+
+        public PythonRt(string interpreter, string pathVirtualEnv)
+        {
+            if (_initialized)
+            {
+                throw new InvalidOperationException("Python runtime already initialized");
+            }
+
+            Init(interpreter, pathVirtualEnv);
+            _initialized = true;
+        }
+
         /// <summary>
         /// Python.NET project provides a WIKI to initialize the library using virtual environments. See:
         ///     https://github.com/pythonnet/pythonnet/wiki/Using-Python.NET-with-Virtual-Environments
@@ -20,7 +33,7 @@ namespace SpacyDotNet
         /// Fixing Python.NET itself would be better but for now, I'm just going to copy sys.path
         /// </summary>
         /// <param name="pathVirtualEnv">Path to virtual environment</param>        
-        public static void Init(string interpreter, string pathVirtualEnv)
+        public void Init(string interpreter, string pathVirtualEnv)
         {
             // SeeCliOptions.Interpreter
             Runtime.PythonDLL = interpreter;            
@@ -56,6 +69,19 @@ namespace SpacyDotNet
             PythonEngine.PythonPath = pythonPath;
 
             PythonEngine.Initialize();
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                // Python.NET is still using a BinaryFormatter. See:
+                //   https://github.com/pythonnet/pythonnet/issues/2469
+                PythonEngine.Shutdown();
+            }
+            catch
+            {
+            }            
         }
     }
 }
