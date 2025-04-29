@@ -84,8 +84,13 @@ namespace PythonNetUtils
 
         public static List<T> GetListFromGenerator<T>(dynamic pyGenerator) where T : new()
         {
-            dynamic builtins = Py.Import("builtins");
-            dynamic list = builtins.list(pyGenerator);
+            dynamic list;
+
+            using (Py.GIL())
+            {
+                dynamic builtins = Py.Import("builtins");
+                list = builtins.list(pyGenerator);
+            }
 
             return GetListFromCollection<T>(list);
         }
