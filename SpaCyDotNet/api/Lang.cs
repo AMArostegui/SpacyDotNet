@@ -34,28 +34,10 @@ namespace SpacyDotNet
             }
         }
 
-        internal dynamic PyLang { get => _pyLang; }
-
-        public PipelineMeta Meta
-        {
-            get => _meta;
-        }
-
-        public List<string> PipeNames
-        {
-            get
-            {
-                return Interop.GetListFromList<string>(_pyLang?.pipe_names, ref _pipeNames);
-            }
-        }
-
-        public Vocab Vocab
-        {
-            get
-            {
-                return new Vocab(_pyLang.vocab);
-            }
-        }
+        internal dynamic PyLang => _pyLang;
+        public PipelineMeta Meta => _meta;
+        public List<string> PipeNames => Interop.GetListFromPyListMember<string>(_pyLang?.pipe_names, ref _pipeNames);
+        public Vocab Vocab => new Vocab(_pyLang.vocab);
 
         public XmlSchema GetSchema()
         {

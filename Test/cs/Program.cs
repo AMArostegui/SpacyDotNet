@@ -19,9 +19,9 @@ namespace Test
             using (new PythonRt(cliOps.Interpreter, cliOps.PathVirtualEnv))
             {
                 SpaCy101.Run();
-                //LinguisticFeatures.Run();
-                //ExampleES.Run();
-                //Serialization.Run();
+                LinguisticFeatures.Run();
+                ExampleES.Run();
+                Serialization.Run();
                 //DisplaCy.Run();
             }
         }

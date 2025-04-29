@@ -44,77 +44,15 @@ namespace SpacyDotNet
             _isTitle = null;
         }
 
-        public string Text
-        {
-            get
-            {
-                return Interop.GetString(_pyLexeme?.text, ref _text);
-            }
-        }
-
-        public string Shape
-        {
-            get
-            {
-                return Interop.GetString(_pyLexeme?.shape_, ref _shape);
-            }
-        }
-
-        public string Prefix
-        {
-            get
-            {
-                return Interop.GetString(_pyLexeme?.prefix_, ref _prefix);
-            }
-        }
-
-        public string Suffix
-        {
-            get
-            {
-                return Interop.GetString(_pyLexeme?.suffix_, ref _suffix);
-            }
-        }
-
-        public string Lang
-        {
-            get
-            {
-                return Interop.GetString(_pyLexeme?.lang_, ref _lang);
-            }
-        }
-
-        public BigInteger Orth
-        {
-            get
-            {
-                return Interop.GetBigInteger(_pyLexeme?.orth, ref _orth);
-            }
-        }
-
-        public bool IsAlpha
-        {
-            get
-            {
-                return Interop.GetBool(_pyLexeme?.is_alpha, ref _isAlpha);
-            }
-        }
-
-        public bool IsDigit
-        {
-            get
-            {
-                return Interop.GetBool(_pyLexeme?.is_digit, ref _isDigit);
-            }
-        }
-
-        public bool IsTitle
-        {
-            get
-            {
-                return Interop.GetBool(_pyLexeme?.is_title, ref _isTitle);
-            }
-        }
+        public string Text => Interop.GetStringMember(_pyLexeme?.text, ref _text);
+        public string Shape => Interop.GetStringMember(_pyLexeme?.shape_, ref _shape);
+        public string Prefix => Interop.GetStringMember(_pyLexeme?.prefix_, ref _prefix);
+        public string Suffix => Interop.GetStringMember(_pyLexeme?.suffix_, ref _suffix);
+        public string Lang => Interop.GetStringMember(_pyLexeme?.lang_, ref _lang);
+        public BigInteger Orth => Interop.GetBigIntegerMember(_pyLexeme?.orth, ref _orth);
+        public bool IsAlpha => Interop.GetBoolMember(_pyLexeme?.is_alpha, ref _isAlpha);
+        public bool IsDigit => Interop.GetBoolMember(_pyLexeme?.is_digit, ref _isDigit);
+        public bool IsTitle => Interop.GetBoolMember(_pyLexeme?.is_title, ref _isTitle);
 
         public XmlSchema GetSchema()
         {

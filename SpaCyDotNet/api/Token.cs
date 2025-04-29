@@ -55,136 +55,24 @@ namespace SpacyDotNet
             _pyToken = token;
         }
 
-        internal dynamic PyObj
-            { get => _pyToken; } 
+        internal dynamic PyObj => _pyToken;
 
-        public string Text
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.text, ref _text);
-            }
-        }
-
-        public string Lemma
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.lemma_, ref _lemma);
-            }
-        }
-
-        public string PoS
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.pos_, ref _pos);
-            }
-        }
-
-        public string Tag
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.tag_, ref _tag);
-            }
-        }
-
-        public string Dep
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.dep_, ref _dep);
-            }
-        }
-
-        public string Shape
-        {
-            get
-            {
-                return Interop.GetString(_pyToken?.shape_, ref _shape);
-            }
-        }
-
-        public bool IsAlpha
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.is_alpha, ref _isAlpha);
-            }
-        }
-
-        public bool IsStop
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.is_stop, ref _isStop);
-            }
-        }
-
-        public bool IsPunct
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.is_punct, ref _isPunct);
-            }
-        }
-
-        public bool IsDigit
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.is_digit, ref _isDigit);
-            }
-        }
-
-        public bool LikeNum
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.like_num, ref _likeNum);
-            }
-        }
-
-        public bool LikeEMail
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.like_email, ref _likeEMail);
-            }
-        }
-
-        public bool HasVector
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.has_vector, ref _hasVector);
-            }
-        }
-
-        public double VectorNorm
-        {
-            get
-            {
-                return Interop.GetDouble(_pyToken?.vector_norm, ref _vectorNorm);
-            }
-        }
-
-        public bool IsOov
-        {
-            get
-            {
-                return Interop.GetBool(_pyToken?.is_oov, ref _isOov);
-            }
-        }
-
-        public int I
-        {
-            get
-            {
-                return Interop.GetInt(_pyToken?.i, ref _i);
-            }
-        }
+        public string Text => Interop.GetStringMember(_pyToken?.text, ref _text);
+        public string Lemma => Interop.GetStringMember(_pyToken?.lemma_, ref _lemma);
+        public string PoS => Interop.GetStringMember(_pyToken?.pos_, ref _pos);
+        public string Tag => Interop.GetStringMember(_pyToken?.tag_, ref _tag);
+        public string Dep => Interop.GetStringMember(_pyToken?.dep_, ref _dep);
+        public string Shape => Interop.GetStringMember(_pyToken?.shape_, ref _shape);
+        public bool IsAlpha => Interop.GetBoolMember(_pyToken?.is_alpha, ref _isAlpha);
+        public bool IsStop => Interop.GetBoolMember(_pyToken?.is_stop, ref _isStop);
+        public bool IsPunct => Interop.GetBoolMember(_pyToken?.is_punct, ref _isPunct);
+        public bool IsDigit => Interop.GetBoolMember(_pyToken?.is_digit, ref _isDigit);
+        public bool LikeNum => Interop.GetBoolMember(_pyToken?.like_num, ref _likeNum);
+        public bool LikeEMail => Interop.GetBoolMember(_pyToken?.like_email, ref _likeEMail);
+        public bool HasVector => Interop.GetBoolMember(_pyToken?.has_vector, ref _hasVector);
+        public double VectorNorm => Interop.GetDoubleMember(_pyToken?.vector_norm, ref _vectorNorm);
+        public bool IsOov => Interop.GetBoolMember(_pyToken?.is_oov, ref _isOov);
+        public int I => Interop.GetIntMember(_pyToken?.i, ref _i);
 
         public Token Head
         {
@@ -212,13 +100,7 @@ namespace SpacyDotNet
             }
         }
 
-        public List<Token> Children
-        {
-            get
-            {
-                return Interop.GetListFromGenerator(_pyToken?.children, ref _children);
-            }
-        }
+        public List<Token> Children => Interop.GetListFromPyGeneratorMember(_pyToken?.children, ref _children);
 
         public double Similarity(Token token)
         {

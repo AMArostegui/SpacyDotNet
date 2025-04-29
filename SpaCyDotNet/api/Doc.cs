@@ -53,45 +53,11 @@ namespace SpacyDotNet
 
         internal dynamic PyDoc { get; set; }
 
-        public string Text
-        {
-            get
-            {
-                return Interop.GetString(PyDoc?.text, ref _text);
-            }
-        }
-
-        public List<Token> Tokens
-        {
-            get
-            {
-                return Interop.GetListFromCollection(PyDoc, ref _tokens);
-            }
-        }
-
-        public List<Span> Sents
-        {
-            get
-            {
-                return Interop.GetListFromGenerator(PyDoc?.sents, ref _sentences);
-            }
-        }
-
-        public List<Span> NounChunks
-        {
-            get
-            {
-                return Interop.GetListFromGenerator(PyDoc?.noun_chunks, ref _nounChunks);
-            }
-        }
-
-        public List<Span> Ents
-        {
-            get
-            {
-                return Interop.GetListFromGenerator(PyDoc?.ents, ref _ents);
-            }
-        }
+        public string Text => Interop.GetStringMember(PyDoc?.text, ref _text);
+        public List<Token> Tokens => Interop.GetListFromPyCollectionMember(PyDoc, ref _tokens);
+        public List<Span> Sents => Interop.GetListFromPyGeneratorMember(PyDoc?.sents, ref _sentences);
+        public List<Span> NounChunks => Interop.GetListFromPyGeneratorMember(PyDoc?.noun_chunks, ref _nounChunks);
+        public List<Span> Ents => Interop.GetListFromPyGeneratorMember(PyDoc?.ents, ref _ents);
 
         public Vocab Vocab
         {
