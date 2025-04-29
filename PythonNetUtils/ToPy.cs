@@ -19,5 +19,29 @@ namespace PythonNetUtils
             var toBytesFunc = builtins.GetAttr("bytes");
             return toBytesFunc.Invoke(bytes.ToPython());
         }
+
+        public static dynamic GetList<T>(T[] list)
+        {
+            var pyLst = new PyList();
+            if (list != null)
+            {
+                var type = typeof(T);
+
+                foreach (var element in list)
+                {
+                    if (type == typeof(string))
+                    {
+                        var pyElement = new PyString((string)(object)element);
+                        pyLst.Append(pyElement);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+            }
+
+            return pyLst;
+        }
     }
 }
