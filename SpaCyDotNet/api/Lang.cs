@@ -36,7 +36,7 @@ namespace SpacyDotNet
 
         internal dynamic PyLang => _pyLang;
         public PipelineMeta Meta => _meta;
-        public List<string> PipeNames => ToClr.GetListFromPyListMember<string>(_pyLang?.pipe_names, ref _pipeNames);
+        public List<string> PipeNames => ToClr.GetListFromListMember<string>(_pyLang?.pipe_names, ref _pipeNames);
         public Vocab Vocab => new Vocab(_pyLang.vocab);
 
         public XmlSchema GetSchema()

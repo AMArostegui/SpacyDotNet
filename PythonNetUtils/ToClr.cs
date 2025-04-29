@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace PythonNetUtils
 {
-    public class ToClr
+    public static class ToClr
     {
         public static T GetMember<T>(dynamic dynBoolPyObj, ref T member)
         {
@@ -71,37 +71,37 @@ namespace PythonNetUtils
             }
         }
 
-        public static List<T> GetListFromPyGeneratorMember<T>(dynamic pyGenerator, ref List<T> lstMember) where T : new()
+        public static List<T> GetListFromGeneratorMember<T>(dynamic pyGenerator, ref List<T> lstMember) where T : new()
         {
             if (lstMember != null)
             {
                 return lstMember;
             }
 
-            lstMember = GetListFromPyGenerator<T>(pyGenerator);
+            lstMember = GetListFromGenerator<T>(pyGenerator);
             return lstMember;
         }
 
-        public static List<T> GetListFromPyGenerator<T>(dynamic pyGenerator) where T : new()
+        public static List<T> GetListFromGenerator<T>(dynamic pyGenerator) where T : new()
         {
             dynamic builtins = Py.Import("builtins");
             dynamic list = builtins.list(pyGenerator);
 
-            return GetListFromPyCollection<T>(list);
+            return GetListFromCollection<T>(list);
         }
 
-        public static List<T> GetListFromPyCollectionMember<T>(dynamic pyCollection, ref List<T> lstMember) where T : new()
+        public static List<T> GetListFromCollectionMember<T>(dynamic pyCollection, ref List<T> lstMember) where T : new()
         {
             if (lstMember != null)
             {
                 return lstMember;
             }
             
-            lstMember = GetListFromPyCollection<T>(pyCollection);
+            lstMember = GetListFromCollection<T>(pyCollection);
             return lstMember;
         }
 
-        public static List<T> GetListFromPyCollection<T>(dynamic pyCollection) where T: new()
+        public static List<T> GetListFromCollection<T>(dynamic pyCollection) where T: new()
         {
             var lstVar = new List<T>();
 
@@ -127,18 +127,18 @@ namespace PythonNetUtils
             }
         }
 
-        public static List<T> GetListFromPyListMember<T>(dynamic pyList, ref List<T> lstMember)
+        public static List<T> GetListFromListMember<T>(dynamic pyList, ref List<T> lstMember)
         {
             if (lstMember != null)
             {
                 return lstMember;
             }              
 
-            lstMember = GetListFromPyList<T>(pyList);
+            lstMember = GetListFromList<T>(pyList);
             return lstMember;
         }
 
-        public static List<T> GetListFromPyList<T>(dynamic pyList)
+        public static List<T> GetListFromList<T>(dynamic pyList)
         {
             var lstVar = new List<T>();
 

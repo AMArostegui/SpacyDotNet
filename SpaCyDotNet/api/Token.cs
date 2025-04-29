@@ -100,7 +100,7 @@ namespace SpacyDotNet
             }
         }
 
-        public List<Token> Children => ToClr.GetListFromPyGeneratorMember(_pyToken?.children, ref _children);
+        public List<Token> Children => ToClr.GetListFromGeneratorMember(_pyToken?.children, ref _children);
 
         public double Similarity(Token token)
         {

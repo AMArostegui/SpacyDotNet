@@ -153,7 +153,7 @@ namespace SpacyDotNet
             }
         }
 
-        public List<Doc> GetDocs(Vocab vocab) => ToClr.GetListFromPyGeneratorMember(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
+        public List<Doc> GetDocs(Vocab vocab) => ToClr.GetListFromGeneratorMember(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
 
         private void Copy(DocBin docBin)
         {
