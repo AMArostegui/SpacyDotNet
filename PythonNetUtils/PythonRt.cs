@@ -79,9 +79,10 @@ namespace PythonNetUtils
                 //   https://github.com/pythonnet/pythonnet/issues/2469
                 PythonEngine.Shutdown();
             }
-            catch
+            catch (PlatformNotSupportedException)
             {
-            }            
+                _initialized = false;
+            }
         }
     }
 }
