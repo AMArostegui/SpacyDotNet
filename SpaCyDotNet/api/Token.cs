@@ -57,22 +57,22 @@ namespace SpacyDotNet
 
         internal dynamic PyObj => _pyToken;
 
-        public string Text => ToClr.GetStringMember(_pyToken?.text, ref _text);
-        public string Lemma => ToClr.GetStringMember(_pyToken?.lemma_, ref _lemma);
-        public string PoS => ToClr.GetStringMember(_pyToken?.pos_, ref _pos);
-        public string Tag => ToClr.GetStringMember(_pyToken?.tag_, ref _tag);
-        public string Dep => ToClr.GetStringMember(_pyToken?.dep_, ref _dep);
-        public string Shape => ToClr.GetStringMember(_pyToken?.shape_, ref _shape);
-        public bool IsAlpha => ToClr.GetBoolMember(_pyToken?.is_alpha, ref _isAlpha);
-        public bool IsStop => ToClr.GetBoolMember(_pyToken?.is_stop, ref _isStop);
-        public bool IsPunct => ToClr.GetBoolMember(_pyToken?.is_punct, ref _isPunct);
-        public bool IsDigit => ToClr.GetBoolMember(_pyToken?.is_digit, ref _isDigit);
-        public bool LikeNum => ToClr.GetBoolMember(_pyToken?.like_num, ref _likeNum);
-        public bool LikeEMail => ToClr.GetBoolMember(_pyToken?.like_email, ref _likeEMail);
-        public bool HasVector => ToClr.GetBoolMember(_pyToken?.has_vector, ref _hasVector);
-        public double VectorNorm => ToClr.GetDoubleMember(_pyToken?.vector_norm, ref _vectorNorm);
-        public bool IsOov => ToClr.GetBoolMember(_pyToken?.is_oov, ref _isOov);
-        public int I => ToClr.GetIntMember(_pyToken?.i, ref _i);
+        public string Text => ToClr.GetMember<string>(_pyToken?.text, ref _text);
+        public string Lemma => ToClr.GetMember<string>(_pyToken?.lemma_, ref _lemma);
+        public string PoS => ToClr.GetMember<string>(_pyToken?.pos_, ref _pos);
+        public string Tag => ToClr.GetMember<string>(_pyToken?.tag_, ref _tag);
+        public string Dep => ToClr.GetMember<string>(_pyToken?.dep_, ref _dep);
+        public string Shape => ToClr.GetMember<string>(_pyToken?.shape_, ref _shape);
+        public bool IsAlpha => ToClr.GetMember<bool?>(_pyToken?.is_alpha, ref _isAlpha);
+        public bool IsStop => ToClr.GetMember<bool?>(_pyToken?.is_stop, ref _isStop);
+        public bool IsPunct => ToClr.GetMember<bool?>(_pyToken?.is_punct, ref _isPunct);
+        public bool IsDigit => ToClr.GetMember<bool?>(_pyToken?.is_digit, ref _isDigit);
+        public bool LikeNum => ToClr.GetMember<bool?>(_pyToken?.like_num, ref _likeNum);
+        public bool LikeEMail => ToClr.GetMember<bool?>(_pyToken?.like_email, ref _likeEMail);
+        public bool HasVector => ToClr.GetMember<bool?>(_pyToken?.has_vector, ref _hasVector);
+        public double VectorNorm => ToClr.GetMember<double?>(_pyToken?.vector_norm, ref _vectorNorm);
+        public bool IsOov => ToClr.GetMember<bool?>(_pyToken?.is_oov, ref _isOov);
+        public int I => ToClr.GetMember<int?>(_pyToken?.i, ref _i);
 
         public Token Head
         {

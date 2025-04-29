@@ -53,7 +53,7 @@ namespace SpacyDotNet
 
         internal dynamic PyDoc { get; set; }
 
-        public string Text => ToClr.GetStringMember(PyDoc?.text, ref _text);
+        public string Text => ToClr.GetMember<string>(PyDoc?.text, ref _text);
         public List<Token> Tokens => ToClr.GetListFromPyCollectionMember(PyDoc, ref _tokens);
         public List<Span> Sents => ToClr.GetListFromPyGeneratorMember(PyDoc?.sents, ref _sentences);
         public List<Span> NounChunks => ToClr.GetListFromPyGeneratorMember(PyDoc?.noun_chunks, ref _nounChunks);

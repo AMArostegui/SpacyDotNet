@@ -8,130 +8,66 @@ namespace PythonNetUtils
 {
     public class ToClr
     {
-        public static bool GetBoolMember(dynamic dynBoolPyObj, ref bool? boolMember)
+        public static T GetMember<T>(dynamic dynBoolPyObj, ref T member)
         {
-            if (boolMember != null)
+            if (member != null)
             {
-                return (bool)boolMember;
+                return member;
             }
 
-            boolMember = GetBool(dynBoolPyObj);
-            return (bool)boolMember;
+            member = Get<T>(dynBoolPyObj);
+            return member;
         }
 
-        public static bool GetBool(dynamic dynBoolPyObj)
+        public static T Get<T>(dynamic dynPyBasicType)
         {
             using (Py.GIL())
             {
-                var boolPyInt = new PyInt(dynBoolPyObj);
-                bool boolVar = boolPyInt.ToInt32() != 0;
-                return boolVar;
-            }
-        }
+                var type = typeof(T);
 
-        public static string GetStringMember(dynamic dynStringPyObj, ref string stringMember)
-        {
-            if (stringMember != null)
-                return stringMember;
+                if (type == typeof(bool) || type == typeof(bool?))
+                {
+                    var boolPyInt = new PyInt(dynPyBasicType);
+                    T boolVar = (T)(object)(boolPyInt.ToInt32() != 0);
+                    return boolVar;
+                }
+                else if (type == typeof(string))
+                {
+                    var depPy = new PyString(dynPyBasicType);
+                    T stringVar = (T)(object)depPy.ToString();
+                    return stringVar;                
+                }
+                else if (type == typeof(double) || type == typeof(double?))
+                {
+                    var dynDoublePyFloat = PyFloat.AsFloat(dynPyBasicType);
+                    T doubleVar = (T)(object)dynDoublePyFloat.As<double>();
+                    return doubleVar;
+                }
+                else if (type == typeof(int) || type == typeof(int?))
+                {
+                    var intPy = new PyInt(dynPyBasicType);
+                    T intVar = (T)(object)intPy.ToInt32();
+                    return intVar;
+                }
+                else if (type == typeof(long) || type == typeof(long?))
+                {
+                    var longPy = new PyInt(dynPyBasicType);
+                    T longVar = (T)(object)longPy.ToInt64();
+                    return longVar;
+                }
+                else if (type == typeof(BigInteger) || type == typeof(BigInteger?))
+                {
+                    var pyInt = new PyInt(dynPyBasicType);
 
-            stringMember = GetString(dynStringPyObj);
-            return stringMember;
-        }
-
-        public static string GetString(dynamic dynStringPyObj)
-        {
-            using (Py.GIL())
-            {
-                var depPy = new PyString(dynStringPyObj);
-                string stringVar = depPy.ToString();
-                return stringVar;
-            }
-        }
-
-        public static double GetDoubleMember(dynamic dynDoublePyObj, ref double? doubleMember)
-        {
-            if (doubleMember != null)
-            {
-                return (double)doubleMember;
-            }                
-
-            doubleMember = GetDouble(dynDoublePyObj);
-            return (double)doubleMember;
-        }
-
-        public static double GetDouble(dynamic dynDoublePyObj)
-        {
-            using (Py.GIL())
-            {
-                var dynDoublePyFloat = PyFloat.AsFloat(dynDoublePyObj);
-                double doubleVar = dynDoublePyFloat.As<double>();
-                return doubleVar;
-            }
-        }
-
-        public static int GetIntMember(dynamic dynIntPyObj, ref int? intMember)
-        {
-            if (intMember != null)
-            {
-                return (int)intMember;
-            }
-
-            intMember = GetInt(dynIntPyObj);
-            return (int)intMember;
-        }
-
-        public static int GetInt(dynamic dynIntPyObj)
-        {
-            using (Py.GIL())
-            {
-                var intPy = new PyInt(dynIntPyObj);
-                int intVar = intPy.ToInt32();
-                return intVar;
-            }
-        }
-
-        public static long GetLongMember(dynamic dynLongPyObj, ref long? longMember)
-        {
-            if (longMember != null)
-            {
-                return (long)longMember;
-            }
-
-            longMember = GetLong(dynLongPyObj);
-            return (long)longMember;               
-        }
-
-        public static long GetLong(dynamic dynLongPyObj)
-        {
-            using (Py.GIL())
-            {
-                var longPy = new PyInt(dynLongPyObj);
-                long longMember = longPy.ToInt64();
-                return longMember;
-            }
-        }
-
-        public static BigInteger GetBigIntegerMember(dynamic dynLongPyObj, ref BigInteger? bigInt)
-        {
-            if (bigInt != null)
-            {
-                return (BigInteger)bigInt;
-            }
-
-            bigInt = GetBigInteger(dynLongPyObj);
-            return (BigInteger)bigInt;
-        }
-
-        public static BigInteger GetBigInteger(dynamic dynLongPyObj)
-        {
-            using (Py.GIL())
-            {                
-                var pyLong = new PyInt(dynLongPyObj);
-
-                // This is inefficient, and should be reworked in the future
-                var str = pyLong.ToString();
-                BigInteger bigInt = BigInteger.Parse(str);
-                return bigInt;
+                    // This is inefficient, and should be reworked in the future
+                    var str = pyInt.ToString();
+                    T bigInt = (T)(object)BigInteger.Parse(str);
+                    return bigInt;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 
