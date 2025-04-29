@@ -141,12 +141,12 @@ namespace SpacyDotNet
                 Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
+                var pyBytes = ToPy.GetBytes(bytes);
+
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
                     PyVocab = spacy.vocab.Vocab.__call__();
-
-                    var pyBytes = ToPy.GetBytes(bytes);
                     PyVocab.from_bytes(pyBytes);
                 }
 

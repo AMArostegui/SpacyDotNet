@@ -85,9 +85,9 @@ namespace SpacyDotNet
         {
             if (Serialization.Selected == Serialization.Mode.Spacy)
             {
+                var pyObj = ToPy.GetBytes(bytes);
                 using (Py.GIL())
-                {
-                    var pyObj = ToPy.GetBytes(bytes);
+                {                    
                     _pyDocBin.from_bytes(pyObj);
                 }
             }
@@ -207,13 +207,12 @@ namespace SpacyDotNet
                 Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
+                var pyBytes = ToPy.GetBytes(bytes);
 
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
-                    _pyDocBin = spacy.tokens.DocBin.__call__();
-
-                    var pyBytes = ToPy.GetBytes(bytes);
+                    _pyDocBin = spacy.tokens.DocBin.__call__();                    
                     _pyDocBin.from_bytes(pyBytes);
                 }
             }

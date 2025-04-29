@@ -149,9 +149,9 @@ namespace SpacyDotNet
         {
             if (Serialization.Selected == Serialization.Mode.Spacy)
             {
+                var pyBytes = ToPy.GetBytes(bytes);
                 using (Py.GIL())
-                {
-                    var pyBytes = ToPy.GetBytes(bytes);
+                {                    
                     PyDoc.from_bytes(pyBytes);
                 }
             }
@@ -203,13 +203,13 @@ namespace SpacyDotNet
                 Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
                 var bytesB64 = reader.ReadElementContentAsString();
                 var bytes = Convert.FromBase64String(bytesB64);
+                var pyBytes = ToPy.GetBytes(bytes);
+
                 using (Py.GIL())
                 {
                     dynamic spacy = Py.Import("spacy");
                     dynamic pyVocab = spacy.vocab.Vocab.__call__();
                     PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
-
-                    var pyBytes = ToPy.GetBytes(bytes);
                     PyDoc.from_bytes(pyBytes);
                     _vocab = new Vocab(PyDoc.vocab);
                 }

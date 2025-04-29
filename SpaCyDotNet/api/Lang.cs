@@ -51,9 +51,9 @@ namespace SpacyDotNet
             Debug.Assert(reader.Name == $"{Serialization.Prefix}:PyObj");
             var bytesB64 = reader.ReadElementContentAsString();
             var bytes = Convert.FromBase64String(bytesB64);
+            var pyBytes = ToPy.GetBytes(bytes);
             using (Py.GIL())
-            {
-                var pyBytes = ToPy.GetBytes(bytes);
+            {                
                 _pyLang.from_bytes(pyBytes);
             }
 
