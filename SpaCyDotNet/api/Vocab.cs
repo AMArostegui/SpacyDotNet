@@ -146,7 +146,7 @@ namespace SpacyDotNet
                     dynamic spacy = Py.Import("spacy");
                     PyVocab = spacy.vocab.Vocab.__call__();
 
-                    var pyBytes = ToPython.GetBytes(bytes);
+                    var pyBytes = ToPy.GetBytes(bytes);
                     PyVocab.from_bytes(pyBytes);
                 }
 
@@ -168,7 +168,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Interop.GetBytes(PyVocab.to_bytes());
+                    var pyObj = ToClr.GetBytes(PyVocab.to_bytes());
                     var pyObjB64 = Convert.ToBase64String(pyObj);
                     writer.WriteElementString("PyObj", Serialization.Namespace, pyObjB64);
                 }

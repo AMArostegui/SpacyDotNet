@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace PythonNetUtils
 {
-    public class Interop
+    public class ToClr
     {
         public static bool GetBoolMember(dynamic dynBoolPyObj, ref bool? boolMember)
         {

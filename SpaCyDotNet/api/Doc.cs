@@ -53,11 +53,11 @@ namespace SpacyDotNet
 
         internal dynamic PyDoc { get; set; }
 
-        public string Text => Interop.GetStringMember(PyDoc?.text, ref _text);
-        public List<Token> Tokens => Interop.GetListFromPyCollectionMember(PyDoc, ref _tokens);
-        public List<Span> Sents => Interop.GetListFromPyGeneratorMember(PyDoc?.sents, ref _sentences);
-        public List<Span> NounChunks => Interop.GetListFromPyGeneratorMember(PyDoc?.noun_chunks, ref _nounChunks);
-        public List<Span> Ents => Interop.GetListFromPyGeneratorMember(PyDoc?.ents, ref _ents);
+        public string Text => ToClr.GetStringMember(PyDoc?.text, ref _text);
+        public List<Token> Tokens => ToClr.GetListFromPyCollectionMember(PyDoc, ref _tokens);
+        public List<Span> Sents => ToClr.GetListFromPyGeneratorMember(PyDoc?.sents, ref _sentences);
+        public List<Span> NounChunks => ToClr.GetListFromPyGeneratorMember(PyDoc?.noun_chunks, ref _nounChunks);
+        public List<Span> Ents => ToClr.GetListFromPyGeneratorMember(PyDoc?.ents, ref _ents);
 
         public Vocab Vocab
         {
@@ -128,7 +128,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    return Interop.GetBytes(PyDoc.to_bytes());
+                    return ToClr.GetBytes(PyDoc.to_bytes());
                 }
             }
             else
@@ -151,7 +151,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyBytes = ToPython.GetBytes(bytes);
+                    var pyBytes = ToPy.GetBytes(bytes);
                     PyDoc.from_bytes(pyBytes);
                 }
             }
@@ -209,7 +209,7 @@ namespace SpacyDotNet
                     dynamic pyVocab = spacy.vocab.Vocab.__call__();
                     PyDoc = spacy.tokens.doc.Doc.__call__(pyVocab);
 
-                    var pyBytes = ToPython.GetBytes(bytes);
+                    var pyBytes = ToPy.GetBytes(bytes);
                     PyDoc.from_bytes(pyBytes);
                     _vocab = new Vocab(PyDoc.vocab);
                 }
@@ -326,7 +326,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Interop.GetBytes(PyDoc.to_bytes());
+                    var pyObj = ToClr.GetBytes(PyDoc.to_bytes());
                     var pyObjB64 = Convert.ToBase64String(pyObj);
                     writer.WriteElementString("PyObj", Serialization.Namespace, pyObjB64);
                 }

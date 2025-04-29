@@ -27,10 +27,10 @@ namespace SpacyDotNet
             _endChar = null;
         }
 
-        public string Text => Interop.GetStringMember(_pySpan?.text, ref _text);
-        public string Label => Interop.GetStringMember(_pySpan?.label_, ref _label);
-        public int StartChar => Interop.GetIntMember(_pySpan?.start_char, ref _startChar);
-        public int EndChar => Interop.GetIntMember(_pySpan?.end_char, ref _endChar);
+        public string Text => ToClr.GetStringMember(_pySpan?.text, ref _text);
+        public string Label => ToClr.GetStringMember(_pySpan?.label_, ref _label);
+        public int StartChar => ToClr.GetIntMember(_pySpan?.start_char, ref _startChar);
+        public int EndChar => ToClr.GetIntMember(_pySpan?.end_char, ref _endChar);
 
         public XmlSchema GetSchema()
         {

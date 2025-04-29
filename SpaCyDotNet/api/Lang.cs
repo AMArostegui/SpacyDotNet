@@ -36,7 +36,7 @@ namespace SpacyDotNet
 
         internal dynamic PyLang => _pyLang;
         public PipelineMeta Meta => _meta;
-        public List<string> PipeNames => Interop.GetListFromPyListMember<string>(_pyLang?.pipe_names, ref _pipeNames);
+        public List<string> PipeNames => ToClr.GetListFromPyListMember<string>(_pyLang?.pipe_names, ref _pipeNames);
         public Vocab Vocab => new Vocab(_pyLang.vocab);
 
         public XmlSchema GetSchema()
@@ -53,7 +53,7 @@ namespace SpacyDotNet
             var bytes = Convert.FromBase64String(bytesB64);
             using (Py.GIL())
             {
-                var pyBytes = ToPython.GetBytes(bytes);
+                var pyBytes = ToPy.GetBytes(bytes);
                 _pyLang.from_bytes(pyBytes);
             }
 
@@ -69,7 +69,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var pyObj = Interop.GetBytes(_pyLang.to_bytes());
+                var pyObj = ToClr.GetBytes(_pyLang.to_bytes());
                 var pyObjB64 = Convert.ToBase64String(pyObj);
                 writer.WriteElementString("PyObj", pyObjB64, Serialization.Namespace);
             }

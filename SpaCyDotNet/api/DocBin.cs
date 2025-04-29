@@ -64,7 +64,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    return Interop.GetBytes(_pyDocBin.to_bytes());
+                    return ToClr.GetBytes(_pyDocBin.to_bytes());
                 }
             }
             else
@@ -87,7 +87,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = ToPython.GetBytes(bytes);
+                    var pyObj = ToPy.GetBytes(bytes);
                     _pyDocBin.from_bytes(pyObj);
                 }
             }
@@ -153,7 +153,7 @@ namespace SpacyDotNet
             }
         }
 
-        public List<Doc> GetDocs(Vocab vocab) => Interop.GetListFromPyGeneratorMember(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
+        public List<Doc> GetDocs(Vocab vocab) => ToClr.GetListFromPyGeneratorMember(_pyDocBin?.get_docs(vocab.PyVocab), ref _docs);
 
         private void Copy(DocBin docBin)
         {
@@ -213,7 +213,7 @@ namespace SpacyDotNet
                     dynamic spacy = Py.Import("spacy");
                     _pyDocBin = spacy.tokens.DocBin.__call__();
 
-                    var pyBytes = ToPython.GetBytes(bytes);
+                    var pyBytes = ToPy.GetBytes(bytes);
                     _pyDocBin.from_bytes(pyBytes);
                 }
             }
@@ -247,7 +247,7 @@ namespace SpacyDotNet
             {
                 using (Py.GIL())
                 {
-                    var pyObj = Interop.GetBytes(_pyDocBin.to_bytes());
+                    var pyObj = ToClr.GetBytes(_pyDocBin.to_bytes());
                     var pyObjB64 = Convert.ToBase64String(pyObj);
                     writer.WriteElementString("PyObj", Serialization.Namespace, pyObjB64);
                 }

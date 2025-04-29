@@ -2,7 +2,7 @@
 
 namespace PythonNetUtils
 {
-    public class ToPython
+    public class ToPy
     {
         public static dynamic GetBytes(byte[] bytes)
         {

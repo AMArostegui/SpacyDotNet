@@ -44,15 +44,15 @@ namespace SpacyDotNet
             _isTitle = null;
         }
 
-        public string Text => Interop.GetStringMember(_pyLexeme?.text, ref _text);
-        public string Shape => Interop.GetStringMember(_pyLexeme?.shape_, ref _shape);
-        public string Prefix => Interop.GetStringMember(_pyLexeme?.prefix_, ref _prefix);
-        public string Suffix => Interop.GetStringMember(_pyLexeme?.suffix_, ref _suffix);
-        public string Lang => Interop.GetStringMember(_pyLexeme?.lang_, ref _lang);
-        public BigInteger Orth => Interop.GetBigIntegerMember(_pyLexeme?.orth, ref _orth);
-        public bool IsAlpha => Interop.GetBoolMember(_pyLexeme?.is_alpha, ref _isAlpha);
-        public bool IsDigit => Interop.GetBoolMember(_pyLexeme?.is_digit, ref _isDigit);
-        public bool IsTitle => Interop.GetBoolMember(_pyLexeme?.is_title, ref _isTitle);
+        public string Text => ToClr.GetStringMember(_pyLexeme?.text, ref _text);
+        public string Shape => ToClr.GetStringMember(_pyLexeme?.shape_, ref _shape);
+        public string Prefix => ToClr.GetStringMember(_pyLexeme?.prefix_, ref _prefix);
+        public string Suffix => ToClr.GetStringMember(_pyLexeme?.suffix_, ref _suffix);
+        public string Lang => ToClr.GetStringMember(_pyLexeme?.lang_, ref _lang);
+        public BigInteger Orth => ToClr.GetBigIntegerMember(_pyLexeme?.orth, ref _orth);
+        public bool IsAlpha => ToClr.GetBoolMember(_pyLexeme?.is_alpha, ref _isAlpha);
+        public bool IsDigit => ToClr.GetBoolMember(_pyLexeme?.is_digit, ref _isDigit);
+        public bool IsTitle => ToClr.GetBoolMember(_pyLexeme?.is_title, ref _isTitle);
 
         public XmlSchema GetSchema()
         {
@@ -68,7 +68,7 @@ namespace SpacyDotNet
 
             using (Py.GIL())
             {
-                var pyBytes = ToPython.GetBytes(bytes);
+                var pyBytes = ToPy.GetBytes(bytes);
                 _pyLexeme.from_bytes(pyBytes);
             }
 
@@ -99,7 +99,7 @@ namespace SpacyDotNet
         {
             using (Py.GIL())
             {
-                var pyObj = Interop.GetBytes(_pyLexeme.to_bytes());
+                var pyObj = ToClr.GetBytes(_pyLexeme.to_bytes());
                 writer.WriteElementString("PyObj", pyObj, Serialization.Namespace);
             }
 
