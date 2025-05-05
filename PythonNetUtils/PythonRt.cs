@@ -80,9 +80,10 @@ namespace PythonNetUtils
                 PythonEngine.Shutdown();
             }
             catch (PlatformNotSupportedException)
-            {
-                _initialized = false;
+            {                
             }
+
+            _initialized = false;
         }
     }
 }
